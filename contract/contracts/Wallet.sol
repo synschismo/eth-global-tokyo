@@ -47,6 +47,8 @@ contract Wallet is Ownable, SuperAppBase, IWallet {
     ISuperToken _usdcX
   ) {
     rentalStorage = _rentalStorage;
+    usdc = _usdc;
+    usdcX = _usdcX;
     cfaV1 = CFAv1Library.InitData(
       _hostSuperfluid,
       IConstantFlowAgreementV1(
@@ -55,6 +57,8 @@ contract Wallet is Ownable, SuperAppBase, IWallet {
         ))
       )
     );
+
+    // handle `afterAgreementTerminated` only
     _hostSuperfluid.registerApp(
         SuperAppDefinitions.APP_LEVEL_FINAL |
             SuperAppDefinitions.BEFORE_AGREEMENT_CREATED_NOOP |
@@ -63,8 +67,6 @@ contract Wallet is Ownable, SuperAppBase, IWallet {
             SuperAppDefinitions.AFTER_AGREEMENT_UPDATED_NOOP |
             SuperAppDefinitions.BEFORE_AGREEMENT_TERMINATED_NOOP
     );
-    usdc = _usdc;
-    usdcX = _usdcX;
   }
 
   function execute(
