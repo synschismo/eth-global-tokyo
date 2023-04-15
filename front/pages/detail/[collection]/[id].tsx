@@ -7,6 +7,11 @@ import { SelectRangeToggle } from "../../../features/SelectRangeToggle";
 import { ModalRentReturn } from "../../../features/ModalRentReturn";
 import { ModalRentSuccess } from "../../../features/ModalRentSuccess";
 import { RentPriceCard } from "../../../features/RentPriceCard";
+import {
+  RentalStorage__factory,
+  Wallet__factory,
+} from "../../../typechain-types";
+import { runLitAction } from "../../../utils/ runLitAction";
 
 const detail = () => {
   const nft = rentNftDetailMock;
@@ -23,6 +28,7 @@ const detail = () => {
   const [balanceRun, setBalanceRun] = useState<number>(0.34);
   const [isSuccessModal, setIsSuccessModal] = useState<boolean>(false);
   const [isReturnModal, setIsReturnModal] = useState<boolean>(false);
+  const [pkp, setPkp] = useState({});
 
   useEffect(() => {
     let interval: any = null;
@@ -35,6 +41,15 @@ const detail = () => {
     }
     return () => clearInterval(interval);
   }, [nowStatus, balanceRun]);
+
+  useEffect(() => {
+    const pkps = localStorage.getItem("lit-cached-pkps");
+    if (pkps == null) return;
+    const pkps_json = JSON.parse(pkps);
+    const key = Object.keys(pkps_json)[0];
+    const pkp = pkps_json[key];
+    if (pkp) setPkp(pkp);
+  }, [])
 
   return (
     <StyleLayout
@@ -82,9 +97,41 @@ const detail = () => {
               />
               <Button
                 title="Rent Now"
-                doAction={() => {
+                doAction={async () => {
+                  // let signer: any;
+                  // const rentalStorageAddr =
+                  //   "0x3D88436c1d23faabEc7B0BbEE794Ba638FF56129";
+                  // const rentalStorage = RentalStorage__factory.connect(
+                  //   rentalStorageAddr,
+                  //   signer
+                  // );
+                  // const lendId = rentalStorage.lendIds(
+                  //   nft.collectionAddress,
+                  //   nft.tokenId
+                  // );
+                  // const returnAt =   '0'; // 0: 無期限, < 0: block.timestamp
+                  // const rentCallData =
+                  //   rentalStorage.interface.encodeFunctionData("rent", [
+                  //     '0',
+                  //     returnAt,
+                  //   ]);
+
+                  // const renterWalletAddr = await rentalStorage.walletByOwner(
+                  //   "owner のアドレス"
+                  // );
+                  // const renterWallet = Wallet__factory.connect(
+                  //   renterWalletAddr,
+                  //   signer
+                  // );
+                  // const result = await renterWallet.execute(
+                  //   rentalStorageAddr,
+                  //   0,
+                  //   rentCallData
+                  // );
+
                   setNowStatus("rented");
                   setIsSuccessModal(true);
+                  runLitAction(pkp);
                 }}
                 color="#ed4b9e"
               />
@@ -92,7 +139,27 @@ const detail = () => {
           ) : (
             <Button
               title="Return Now"
-              doAction={() => {
+              doAction={async () => {
+                // let signer: any;
+                // const rentalStorageAddr =
+                //   "0x3D88436c1d23faabEc7B0BbEE794Ba638FF56129";
+                // const rentalStorage = RentalStorage__factory.connect(
+                //   rentalStorageAddr,
+                //   signer
+                // );
+                // const renterWalletAddr = await rentalStorage.walletByOwner(
+                //   "owner のアドレス"
+                // );
+                // const renterWallet = Wallet__factory.connect(
+                //   renterWalletAddr,
+                //   signer
+                // );
+                // const rentId = await rentalStorage.rentIds(
+                //   nft.collectionAddress,
+                //   nft.tokenId
+                // );
+                // const result = await renterWallet.returnRentItem(rentId);
+
                 setNowStatus("available");
                 setIsReturnModal(true);
               }}

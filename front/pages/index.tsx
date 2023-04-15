@@ -30,37 +30,60 @@ const Home: NextPage = () => {
     const f = async () => {
       const query = gql`
         query MyQuery($cursor: String, $owners: [Identity!], $limit: Int) {
-          TokenBalances(
+          TokenNfts(
             input: {
               filter: {
-                owner: { _in: $owners }
-                tokenType: { _in: [ERC1155, ERC721] }
+                address: { _eq: "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d" }
               }
-              blockchain: polygon
-              limit: $limit
-              cursor: $cursor
+              blockchain: ethereum
             }
           ) {
-            TokenBalance {
-              amount
+            TokenNft {
+              address
               chainId
+              contentType
+              contentValue {
+                image {
+                  extraSmall
+                  original
+                  large
+                }
+              }
+              #currentHolderCount - being fixed
               id
-              lastUpdatedBlock
-              lastUpdatedTimestamp
-              owner {
-                addresses
-              }
-              tokenAddress
-              tokenId
-              tokenType
-              token {
+              lastTransferBlock
+              lastTransferHash
+              lastTransferTimestamp
+              metaData {
+                animationUrl
+                attributes {
+                  trait_type
+                  value
+                }
+                backgroundColor
+                description
+                image
+                externalUrl
+                imageData
                 name
-                symbol
+                youtubeUrl
               }
+              rawMetaData
+              token {
+                id
+              }
+              tokenBalances {
+                id
+              }
+              tokenId
+              tokenURI
+              totalSupply
+              #transferCount - being fixed
+              type
             }
             pageInfo {
-              prevCursor
               nextCursor
+              prevCursor
             }
           }
         }
