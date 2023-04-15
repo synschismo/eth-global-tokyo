@@ -2,25 +2,28 @@ import { StyleLayout } from "../../../features/StyleLayout";
 import Image from "next/image";
 import { chainToCurrencyImage } from "../../../utils/chainToCurrencyImage";
 import { useEffect, useState } from "react";
-import { Listbox } from "@headlessui/react";
-import { IoIosArrowDown } from "react-icons/io";
 import { rentNftDetailMock } from "../../../mocks/rentNftDetailMock";
 import { Button } from "../../../components/Button";
 import { round } from "../../../utils/round";
+import { SelectRangeToggle } from "../../../features/SelectRangeToggle";
+import { ModalRentReturn } from "../../../features/ModalRentReturn";
+import { ModalRentSuccess } from "../../../features/ModalRentSuccess";
 
 const detail = () => {
   const nft = rentNftDetailMock;
-  const people = [
+  const list = [
     { id: 1, name: "infinite", unavailable: false },
     { id: 2, name: "1 day", unavailable: false },
     { id: 3, name: "1 week", unavailable: false },
     { id: 4, name: "1 month", unavailable: false },
   ];
-  const [selectedPerson, setSelectedPerson] = useState(people[0]);
+  const [selectItem, setSelectItem] = useState(list[0]);
   const [nowStatus, setNowStatus] = useState<"available" | "rented">(
     "available"
   );
   const [balanceRun, setBalanceRun] = useState<number>(0.34);
+  const [isSuccessModal, setIsSuccessModal] = useState<boolean>(false);
+  const [isReturnModal, setIsReturnModal] = useState<boolean>(false);
 
   useEffect(() => {
     let interval: any = null;
@@ -40,6 +43,18 @@ const detail = () => {
       menuStatus="rental"
       balanceRun={balanceRun.toString()}
     >
+      <ModalRentSuccess
+        isOpen={isSuccessModal}
+        onClose={() => {
+          setIsSuccessModal(false);
+        }}
+      />
+      <ModalRentReturn
+        isOpen={isReturnModal}
+        onClose={() => {
+          setIsReturnModal(false);
+        }}
+      />
       <div className="mx-4">
         <div className="relative aspect-square w-full rounded-2xl bg-slate-300">
           <Image
@@ -76,40 +91,27 @@ const detail = () => {
           </div>
           {nowStatus === "available" ? (
             <>
-              <div className="border-gray mx-4 mt-4 rounded-2xl border p-4 text-lg font-bold">
-                <Listbox value={selectedPerson} onChange={setSelectedPerson}>
-                  <Listbox.Button className="w-full">
-                    <div className="flex items-center justify-between">
-                      <div>{selectedPerson.name}</div>
-                      <div>
-                        <IoIosArrowDown size={24} />
-                      </div>
-                    </div>
-                  </Listbox.Button>
-                  <Listbox.Options>
-                    {people.map((person) => (
-                      <Listbox.Option
-                        key={person.id}
-                        value={person}
-                        disabled={person.unavailable}
-                        className="py-2"
-                      >
-                        {person.name}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </Listbox>
-              </div>
+              <SelectRangeToggle
+                list={list}
+                selectItem={selectItem}
+                setSelectItem={setSelectItem}
+              />
               <Button
                 title="Rent Now"
-                doAction={() => setNowStatus("rented")}
+                doAction={() => {
+                  setNowStatus("rented");
+                  setIsSuccessModal(true);
+                }}
                 color="#ed4b9e"
               />
             </>
           ) : (
             <Button
               title="Return Now"
-              doAction={() => setNowStatus("available")}
+              doAction={() => {
+                setNowStatus("available");
+                setIsReturnModal(true);
+              }}
               color="#463a3f"
             />
           )}

@@ -15,7 +15,7 @@ const detail = () => {
           description="GBC is a generative 10,000 Blueberries NFT collection on Arbitrum dedicated to GMX..."
         />
       </div>
-      <div className="mx-3 mb-32 mt-8 grid grid-cols-2 gap-y-4">
+      <div className="mx-3 mt-8 grid grid-cols-2 gap-y-4 pb-32">
         {rentNftsMock &&
           rentNftsMock.map((rentNft, index) => {
             const collectionName = rentNft.collectionName;
