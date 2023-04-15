@@ -12,15 +12,17 @@ import {IConstantFlowAgreementV1} from "@superfluid-finance/ethereum-contracts/c
 import {CFAv1Library} from "@superfluid-finance/ethereum-contracts/contracts/apps/CFAv1Library.sol";
 import {SuperAppBase} from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperAppBase.sol";
 
-import "./RentalStorage.sol";
+import "./IRentalStorage.sol";
 import "./IWallet.sol";
 import {CommonTypes} from "./CommonTypes.sol";
 
-contract Wallet is Ownable, SuperAppBase, IWallet {
+import "hardhat/console.sol";
+
+contract Wallet is SuperAppBase, Ownable, IWallet {
   using ECDSA for bytes32;
   using Address for address;
 
-  RentalStorage public rentalStorage;
+  IRentalStorage public rentalStorage;
   modifier onlyRentalStorage {
     require(msg.sender == address(rentalStorage), "Wallet: only RentalStorage can call this function");
     _;
@@ -41,11 +43,13 @@ contract Wallet is Ownable, SuperAppBase, IWallet {
   ISuperToken public usdcX;
 
   constructor (
-    RentalStorage _rentalStorage,
+    address _owner,
+    IRentalStorage _rentalStorage,
     ISuperfluid _hostSuperfluid,
     IERC20 _usdc,
     ISuperToken _usdcX
   ) {
+    transferOwnership(_owner);
     rentalStorage = _rentalStorage;
     usdc = _usdc;
     usdcX = _usdcX;
@@ -76,7 +80,6 @@ contract Wallet is Ownable, SuperAppBase, IWallet {
   ) external onlyOwner override {
     // check lend/rent item approve/transfer/burn
     require(rentalStorage.validateExecution(_to, _data), "Wallet: denied execution");
-
     require(_to != address(cfaV1.host), "Wallet: cannot call Superfluid directory");
 
     (bool success, ) = _to.call{value: _value}(_data);
@@ -101,8 +104,20 @@ contract Wallet is Ownable, SuperAppBase, IWallet {
   }
 
   function _returnRentItem(uint256 _rentId) internal {
-    // TODO: transfer
-    // IERC721(rentInfo.tokenAddress).safeTransferFrom(address(this), lenderWallet, rentInfo.tokenId);
+    require(activeRentId == _rentId, "Wallet: not active rent");
+
+    CommonTypes.RentInfo memory rentInfo = rentalStorage.getRentInfo(_rentId);
+    require(rentInfo.renterWallet == address(this), "Wallet: not renter");
+    CommonTypes.LendInfo memory lendInfo = rentalStorage.getLendInfo(rentInfo.lendId);
+
+    // stop superflow
+    cfaV1.deleteFlow(address(this), lendInfo.lenderWallet, usdcX);
+
+    // transfer
+    try IERC721(rentInfo.tokenAddress).safeTransferFrom(address(this), lendInfo.lenderWallet, rentInfo.tokenId) {
+    } catch Error(string memory reason) {
+      revert(reason);
+    }
 
     rentalStorage.onReturned(_rentId);
 
@@ -110,17 +125,23 @@ contract Wallet is Ownable, SuperAppBase, IWallet {
     activeRentId = 0;
   }
 
+  // callback for renter
   function onRent(uint256 _rentId, address _lenderWallet, int96 flowRate) external onlyRentalStorage {
     require(activeRentId == 0, "Wallet: only support one rent at a time");
+
     // configure superfluid
     cfaV1.createFlow(_lenderWallet, usdcX, flowRate);
 
     activeRentId = _rentId;
   }
 
+  // callback for lender
   function onLend(address _renterWallet, address _tokenAddress, uint256 _tokenId) external onlyRentalStorage {
     // transfer
-    IERC721(_tokenAddress).safeTransferFrom(address(this), _renterWallet, _tokenId);
+    try IERC721(_tokenAddress).safeTransferFrom(address(this), _renterWallet, _tokenId) {
+    } catch Error(string memory reason) {
+      revert(reason);
+    }
   }
 
   function afterAgreementTerminated(
@@ -138,6 +159,10 @@ contract Wallet is Ownable, SuperAppBase, IWallet {
     _returnRentItem(activeRentId);
 
     return _ctx;
+  }
+
+  function onERC721Received(address, address, uint256, bytes calldata) external override returns (bytes4) {
+    return this.onERC721Received.selector;
   }
 
   function isValidSignature(
