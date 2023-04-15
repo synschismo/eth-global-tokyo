@@ -8,6 +8,8 @@ import "./Wallet.sol";
 import "./IRentalStorage.sol";
 import {CommonTypes} from "./CommonTypes.sol";
 
+import "hardhat/console.sol";
+
 contract RentalStorage is Ownable, IRentalStorage {
   WalletFactory walletFactory;
 
@@ -20,13 +22,17 @@ contract RentalStorage is Ownable, IRentalStorage {
     _;
   }
 
-  mapping(address wallet => address owner) ownerByWallet;
+  mapping(address wallet => address owner) public ownerByWallet;
+  mapping(address owner => address wallet) public walletByOwner;
 
   function registerWallet(
     address _owner,
     address _wallet
   ) external onlyWalletFactory {
+    require(walletByOwner[_owner] == address(0), "Wallet: already registered wallet");
+    require(ownerByWallet[_wallet] == address(0), "Wallet: already registered owner");
     ownerByWallet[_wallet] = _owner;
+    walletByOwner[_owner] = _wallet;
   }
 
   uint256 lendNonce;
@@ -42,17 +48,21 @@ contract RentalStorage is Ownable, IRentalStorage {
     bytes calldata _data
   ) external view override returns (bool) {
     // parse _data and detect selector (approve/transfer/burn) and tokenId
-    revert("TODO");
+
+    return true;
   }
 
   function list(
     address tokenAddress,
     uint256 tokenId,
     uint256 feePerSec
-  ) external onlyWalletFactory returns (uint256 lendId) {
+  ) external returns (uint256 lendId) {
+    require(feePerSec > 0, "Wallet: feePerSec must be greater than 0");
+    require(ownerByWallet[msg.sender] != address(0), "Wallet: not registered wallet");
+
     lendId = ++lendNonce;
 
-    // todo: check item is not registered
+    require(lendIds[tokenAddress][tokenId] == 0, "Wallet: item is already listing");
 
     lendIds[tokenAddress][tokenId] = lendId;
     lendInfoList[lendId] = CommonTypes.LendInfo(

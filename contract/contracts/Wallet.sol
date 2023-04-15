@@ -4,8 +4,7 @@ pragma solidity ^0.8.18;
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
-// import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {ISuperfluid, ISuperToken, SuperAppDefinitions} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
@@ -17,15 +16,17 @@ import "./IRentalStorage.sol";
 import "./IWallet.sol";
 import {CommonTypes} from "./CommonTypes.sol";
 
-contract Wallet is SuperAppBase, Initializable, IWallet {
+import "hardhat/console.sol";
+
+contract Wallet is SuperAppBase, Ownable, IWallet {
   using ECDSA for bytes32;
   using Address for address;
 
-  address public owner;
-  modifier onlyOwner {
-    require(msg.sender == owner, "Wallet: only owner can call this function");
-    _;
-  }
+  // address public owner;
+  // modifier onlyOwner {
+  //   require(msg.sender == owner, "Wallet: only owner can call this function");
+  //   _;
+  // }
 
   IRentalStorage public rentalStorage;
   modifier onlyRentalStorage {
@@ -48,11 +49,13 @@ contract Wallet is SuperAppBase, Initializable, IWallet {
   ISuperToken public usdcX;
 
   constructor (
+    address _owner,
     IRentalStorage _rentalStorage,
     ISuperfluid _hostSuperfluid,
     IERC20 _usdc,
     ISuperToken _usdcX
   ) {
+    transferOwnership(_owner);
     rentalStorage = _rentalStorage;
     usdc = _usdc;
     usdcX = _usdcX;
@@ -74,12 +77,6 @@ contract Wallet is SuperAppBase, Initializable, IWallet {
             SuperAppDefinitions.AFTER_AGREEMENT_UPDATED_NOOP |
             SuperAppDefinitions.BEFORE_AGREEMENT_TERMINATED_NOOP
     );
-
-    _disableInitializers();
-  }
-
-  function initialize(address _owner) public initializer {
-    owner = _owner;
   }
 
   function execute(
@@ -89,7 +86,6 @@ contract Wallet is SuperAppBase, Initializable, IWallet {
   ) external onlyOwner override {
     // check lend/rent item approve/transfer/burn
     require(rentalStorage.validateExecution(_to, _data), "Wallet: denied execution");
-
     require(_to != address(cfaV1.host), "Wallet: cannot call Superfluid directory");
 
     (bool success, ) = _to.call{value: _value}(_data);
@@ -158,7 +154,7 @@ contract Wallet is SuperAppBase, Initializable, IWallet {
     bytes memory _signature
   ) public view override returns (bytes4) {
     address signer = _hash.recover(_signature);
-    if (owner == signer) {
+    if (owner() == signer) {
       return IERC1271.isValidSignature.selector;
     } else {
       return 0xffffffff;

@@ -9,10 +9,9 @@ import {ISuperfluid} from "@superfluid-finance/ethereum-contracts/contracts/inte
 
 import "./IRentalStorage.sol";
 import "./Wallet.sol";
+import "./IWalletFactory.sol";
 
-contract WalletFactory is Ownable {
-  Wallet public immutable walletImplementation;
-
+contract WalletFactory is IWalletFactory, Ownable {
   uint256 constant public salt = 1234;
 
   IRentalStorage immutable public rentalStorage;
@@ -30,33 +29,17 @@ contract WalletFactory is Ownable {
     hostSuperfluid = _hostSuperfluid;
     feeToken = _feeToken;
     feeTokenX = _feeTokenX;
-    walletImplementation = new Wallet(
-      _rentalStorage,
-      _hostSuperfluid,
-      _feeToken,
-      _feeTokenX
+  }
+
+  function createWallet(address owner) external override returns (Wallet wallet) {
+    wallet = new Wallet(
+      owner,
+      rentalStorage,
+      hostSuperfluid,
+      feeToken,
+      feeTokenX
     );
-  }
-
-  function createWallet(address owner) external returns (Wallet wallet) {
-    address addr = getAddress(owner);
-    uint codeSize = addr.code.length;
-    if (codeSize > 0) {
-      return Wallet(payable(addr));
-    }
-    return Wallet(payable(new ERC1967Proxy{salt : bytes32(salt)}(
-      address(walletImplementation),
-      abi.encodeCall(Wallet.initialize, (owner))
-    )));
-  }
-
-  function getAddress(address owner) public view returns (address wallet) {
-    return Create2.computeAddress(bytes32(salt), keccak256(abi.encodePacked(
-      type(ERC1967Proxy).creationCode,
-      abi.encode(
-        address(walletImplementation),
-        abi.encodeCall(Wallet.initialize, (owner))
-      )
-    )));
+    rentalStorage.registerWallet(owner, address(wallet));
+    return wallet;
   }
 }
