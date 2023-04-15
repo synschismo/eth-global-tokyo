@@ -22,12 +22,6 @@ contract Wallet is SuperAppBase, Ownable, IWallet {
   using ECDSA for bytes32;
   using Address for address;
 
-  // address public owner;
-  // modifier onlyOwner {
-  //   require(msg.sender == owner, "Wallet: only owner can call this function");
-  //   _;
-  // }
-
   IRentalStorage public rentalStorage;
   modifier onlyRentalStorage {
     require(msg.sender == address(rentalStorage), "Wallet: only RentalStorage can call this function");
@@ -110,8 +104,19 @@ contract Wallet is SuperAppBase, Ownable, IWallet {
   }
 
   function _returnRentItem(uint256 _rentId) internal {
-    // TODO: transfer
-    // IERC721(rentInfo.tokenAddress).safeTransferFrom(address(this), lenderWallet, rentInfo.tokenId);
+    require(activeRentId == _rentId, "Wallet: not active rent");
+
+    CommonTypes.RentInfo memory rentInfo = rentalStorage.getRentInfo(_rentId);
+    require(rentInfo.renterWallet == address(this), "Wallet: not renter");
+    CommonTypes.LendInfo memory lendInfo = rentalStorage.getLendInfo(rentInfo.lendId);
+
+    // TODO: stop superflow
+
+    // transfer
+    try IERC721(rentInfo.tokenAddress).safeTransferFrom(address(this), lendInfo.lenderWallet, rentInfo.tokenId) {
+    } catch Error(string memory reason) {
+      revert(reason);
+    }
 
     rentalStorage.onReturned(_rentId);
 
@@ -120,16 +125,23 @@ contract Wallet is SuperAppBase, Ownable, IWallet {
   }
 
   function onRent(uint256 _rentId, address _lenderWallet, int96 flowRate) external onlyRentalStorage {
+    console.log("[Wallet.onRent]", _rentId, _lenderWallet);
     require(activeRentId == 0, "Wallet: only support one rent at a time");
+
     // configure superfluid
+    console.log("[Wallet.onRent] creating flow...");
     cfaV1.createFlow(_lenderWallet, usdcX, flowRate);
+    console.log("[Wallet.onRent] flow created");
 
     activeRentId = _rentId;
   }
 
   function onLend(address _renterWallet, address _tokenAddress, uint256 _tokenId) external onlyRentalStorage {
     // transfer
-    IERC721(_tokenAddress).safeTransferFrom(address(this), _renterWallet, _tokenId);
+    try IERC721(_tokenAddress).safeTransferFrom(address(this), _renterWallet, _tokenId) {
+    } catch Error(string memory reason) {
+      revert(reason);
+    }
   }
 
   function afterAgreementTerminated(
@@ -147,6 +159,10 @@ contract Wallet is SuperAppBase, Ownable, IWallet {
     _returnRentItem(activeRentId);
 
     return _ctx;
+  }
+
+  function onERC721Received(address, address, uint256, bytes calldata) external override returns (bytes4) {
+    return this.onERC721Received.selector;
   }
 
   function isValidSignature(
