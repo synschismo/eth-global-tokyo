@@ -33,6 +33,10 @@ a {
   background-color: #ed4b9e;
 }
 
+.border-pink {
+  border-color: #ed4b9e;
+}
+
 .text-pink {
   color: #ed4b9e;
 }
@@ -51,4 +55,8 @@ a {
 
 .bg-gray {
   background-color: #f8f8f8;
+}
+
+.bg-brown {
+  background-color: #463a3f;
 }
