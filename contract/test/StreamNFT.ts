@@ -148,7 +148,7 @@ describe("StreamNFT", () => {
       await expect(user1Wallet.connect(user1).upgradeUSDCx(80000)).to.be.not.reverted;
       expect(await daix.balanceOf({account: user1Wallet.address, providerOrSigner: user1})).to.be.equal("80000");
 
-      await expect(user1Wallet.connect(user1).execute(rentalStorage.address, 0, rentCallData)).to.be.revertedWith("hoge");
+      await expect(user1Wallet.connect(user1).execute(rentalStorage.address, 0, rentCallData)).to.be.not.reverted;
       // expect(await testERC721.ownerOf(1)).to.be.equal(user1Wallet.address);
       // const rentId = await rentalStorage.rentIds(testERC721.address, 1);
       // expect(rentId).to.be.not.equal(0);

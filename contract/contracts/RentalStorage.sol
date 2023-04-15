@@ -106,7 +106,6 @@ contract RentalStorage is Ownable, IRentalStorage {
     console.log("[RentalStorage.rent]", lendId);
     Wallet renterWallet = Wallet(payable(msg.sender));
 
-    console.log("hoge");
     CommonTypes.LendInfo memory lendInfo = lendInfoList[lendId];
     require(lendInfo.lenderWallet != address(0), "Wallet: lendId not found");
     require(lendIds[lendInfo.tokenAddress][lendInfo.tokenId] == lendId, "Wallet: lendId not found");
@@ -116,12 +115,10 @@ contract RentalStorage is Ownable, IRentalStorage {
     // transfer item from lender to renter and configure fee
     Wallet lenderWallet = Wallet(payable(lendInfo.lenderWallet));
 
-    console.log("fuga");
     try renterWallet.onRent(rentId, address(lenderWallet), lendInfo.flowRate) {
     } catch Error(string memory reason) {
       revert(reason);
     }
-    console.log("piyo");
     try lenderWallet.onLend(address(renterWallet), lendInfo.tokenAddress, lendInfo.tokenId) {
     } catch Error(string memory reason) {
       revert(reason);
