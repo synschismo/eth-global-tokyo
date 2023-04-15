@@ -1,13 +1,6 @@
-export const rentNftsMock: {
-  collectionName: string;
-  collectionAddress: string;
-  name: string;
-  tokenId: string;
-  image: string;
-  price: string;
-  chainId: string;
-  status: "available" | "rented";
-}[] = [
+import { RentNftType } from "../types/RentNftType";
+
+export const rentNftsMock: RentNftType[] = [
   {
     collectionName: "VeryLongAnimlas",
     collectionAddress: "0x123",

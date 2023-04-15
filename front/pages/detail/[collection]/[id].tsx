@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Listbox } from "@headlessui/react";
 import { IoIosArrowDown } from "react-icons/io";
 import { rentNftDetailMock } from "../../../mocks/rentNftDetailMock";
-import { userMock } from "../../../mocks/userMock";
+import { Button } from "../../../components/Button";
 
 const detail = () => {
   const nft = rentNftDetailMock;
@@ -82,20 +82,18 @@ const detail = () => {
                   </Listbox.Options>
                 </Listbox>
               </div>
-              <div
-                onClick={() => setNowStatus("rented")}
-                className="bg-pink mx-4 mt-4 cursor-pointer rounded-2xl py-4 text-center font-bold text-white"
-              >
-                Rent Now
-              </div>
+              <Button
+                title="Rent Now"
+                doAction={() => setNowStatus("rented")}
+                color="#ed4b9e"
+              />
             </>
           ) : (
-            <div
-              onClick={() => setNowStatus("available")}
-              className="bg-brown mx-4 mt-4 cursor-pointer rounded-2xl py-4 text-center font-bold text-white"
-            >
-              Return Now
-            </div>
+            <Button
+              title="Return Now"
+              doAction={() => setNowStatus("available")}
+              color="#463a3f"
+            />
           )}
         </div>
       </div>
