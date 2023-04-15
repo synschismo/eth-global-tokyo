@@ -1,28 +1,43 @@
 import Image from "next/image";
 import { FC } from "react";
 
-type Props = {};
+type Props = {
+  collectionName: string;
+  coverImage: string;
+  logoImage: string;
+  description: string;
+};
 
-export const CollectionCard: FC<Props> = ({}) => {
+export const CollectionCard: FC<Props> = ({
+  collectionName,
+  coverImage,
+  logoImage,
+  description,
+}) => {
   return (
     <div className="bg-gray h-[242px] w-[343px] rounded-lg">
-      <div className="h-[94px] w-[343] rounded-lg bg-gray-300">
+      <div className="relative h-[94px] w-[343] rounded-t-lg bg-gray-300">
         <Image
-          className=""
-          src={"/images/1.png"}
+          className="rounded-t-lg"
+          src={coverImage}
           fill
-          style={{ objectFit: "cover", borderRadius: "50%" }}
+          style={{ objectFit: "cover" }}
           alt=""
         />
       </div>
       <div className="-translate-y-8">
-        <div className="ml-4 h-16 w-16  bg-gray-200"></div>
+        <div className="relative ml-4 h-16  w-16 rounded-lg border-2 border-white bg-gray-200">
+          <Image
+            className="rounded-lg"
+            src={logoImage}
+            fill
+            style={{ objectFit: "cover" }}
+            alt=""
+          />
+        </div>
         <div className="text-brown mt-6 px-3">
-          <div className="text-xl font-bold">Very Long Animals</div>
-          <div className=" mt-2 text-sm">
-            GBC is a generative 10,000 Blueberries NFT collection on Arbitrum
-            dedicated to GMX...
-          </div>
+          <div className="text-xl font-bold">{collectionName}</div>
+          <div className=" mt-2 text-sm">{description}</div>
         </div>
       </div>
     </div>
