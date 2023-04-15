@@ -7,6 +7,10 @@ import { SelectRangeToggle } from "../../../features/SelectRangeToggle";
 import { ModalRentReturn } from "../../../features/ModalRentReturn";
 import { ModalRentSuccess } from "../../../features/ModalRentSuccess";
 import { RentPriceCard } from "../../../features/RentPriceCard";
+import {
+  RentalStorage__factory,
+  Wallet__factory,
+} from "../../../typechain-types";
 
 const detail = () => {
   const nft = rentNftDetailMock;
@@ -82,7 +86,38 @@ const detail = () => {
               />
               <Button
                 title="Rent Now"
-                doAction={() => {
+                doAction={async () => {
+                  let signer: any;
+                  const rentalStorageAddr =
+                    "0x3D88436c1d23faabEc7B0BbEE794Ba638FF56129";
+                  const rentalStorage = RentalStorage__factory.connect(
+                    rentalStorageAddr,
+                    signer
+                  );
+                  const lendId = rentalStorage.lendIds(
+                    nft.collectionAddress,
+                    nft.tokenId
+                  );
+                  const returnAt = 0; // 0: 無期限, < 0: block.timestamp
+                  const rentCallData =
+                    rentalStorage.interface.encodeFunctionData("rent", [
+                      lendId,
+                      returnAt,
+                    ]);
+
+                  const renterWalletAddr = await rentalStorage.walletByOwner(
+                    "owner のアドレス"
+                  );
+                  const renterWallet = Wallet__factory.connect(
+                    renterWalletAddr,
+                    signer
+                  );
+                  const result = await renterWallet.execute(
+                    rentalStorageAddr,
+                    0,
+                    rentCallData
+                  );
+
                   setNowStatus("rented");
                   setIsSuccessModal(true);
                 }}
@@ -92,7 +127,27 @@ const detail = () => {
           ) : (
             <Button
               title="Return Now"
-              doAction={() => {
+              doAction={async () => {
+                let signer: any;
+                const rentalStorageAddr =
+                  "0x3D88436c1d23faabEc7B0BbEE794Ba638FF56129";
+                const rentalStorage = RentalStorage__factory.connect(
+                  rentalStorageAddr,
+                  signer
+                );
+                const renterWalletAddr = await rentalStorage.walletByOwner(
+                  "owner のアドレス"
+                );
+                const renterWallet = Wallet__factory.connect(
+                  renterWalletAddr,
+                  signer
+                );
+                const rentId = await rentalStorage.rentIds(
+                  nft.collectionAddress,
+                  nft.tokenId
+                );
+                const result = await renterWallet.returnRentItem(rentId);
+
                 setNowStatus("available");
                 setIsReturnModal(true);
               }}
