@@ -12,10 +12,21 @@ interface IRentalStorage {
   function getLendInfo(uint256 _lendId) external view returns (CommonTypes.LendInfo memory lendInfo);
   function getRentInfo(uint256 _rentId) external view returns (CommonTypes.RentInfo memory rentInfo);
 
+  function list(
+    address _tokenAddress,
+    uint256 _tokenId,
+    int96 _flowRate
+  ) external returns (uint256 lendId);
+
+  function unList(uint256 _lendId) external;
+
+  function returnScheduledRent(uint256 _rentId) external;
+
+  // callback from Wallet
+  function onReturned(uint256 _rentId) external;
+
   function validateExecution(
     address _to,
     bytes calldata _data
   ) external view returns (bool);
-
-  function onReturned(uint256 _rentId) external;
 }

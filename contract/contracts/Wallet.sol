@@ -16,8 +16,6 @@ import "./IRentalStorage.sol";
 import "./IWallet.sol";
 import {CommonTypes} from "./CommonTypes.sol";
 
-import "hardhat/console.sol";
-
 contract Wallet is SuperAppBase, Ownable, IWallet {
   using ECDSA for bytes32;
   using Address for address;

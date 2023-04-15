@@ -9,8 +9,6 @@ import "./Wallet.sol";
 import "./IRentalStorage.sol";
 import {CommonTypes} from "./CommonTypes.sol";
 
-import "hardhat/console.sol";
-
 contract RentalStorage is Ownable, IRentalStorage {
   WalletFactory walletFactory;
 
