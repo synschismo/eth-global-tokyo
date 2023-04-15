@@ -30,7 +30,7 @@ const Home: NextPage = () => {
       <div className="border-gray text-gray mb-4 mt-12 border-b border-t px-2 py-4 text-center font-bold">
         My NFTs
       </div>
-      <div className="mx-3 mb-32 grid grid-cols-2 gap-y-4">
+      <div className="mx-3 grid grid-cols-2 gap-y-4 pb-32">
         {walletNftsMock &&
           walletNftsMock.map((nft, index) => {
             const collectionName = nft.collectionName;

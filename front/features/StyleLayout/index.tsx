@@ -20,24 +20,28 @@ export const StyleLayout: FC<Props> = ({
   const [isOpen, setIsOpen] = useState(true);
   const user = userMock;
   return (
-    <div className=" mx-auto min-h-screen max-w-[390px] bg-white">
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <div className="text-center font-bold">Lit Protocol Login</div>
-        <div className="mt-6 flex justify-center">
-          <div className="bg-brown rounded-xl px-8 py-2 font-bold text-white">
-            Login
+    <div className="flex justify-center">
+      <div className="min-h-screen w-[390px] bg-white">
+        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+          <div className="text-brown text-center font-bold">
+            Lit Protocol Login
           </div>
-        </div>
-      </Modal>
-      <Header
-        balance={user.balance}
-        chainId={user.chainId}
-        address={user.address}
-        balanceRun={balanceRun}
-        status={rentStatus}
-      />
-      {children}
-      <Footer mode={menuStatus} />
+          <div className="mt-6 flex justify-center">
+            <div className="bg-brown rounded-xl px-8 py-2 font-bold text-white">
+              Login
+            </div>
+          </div>
+        </Modal>
+        <Header
+          balance={user.balance}
+          chainId={user.chainId}
+          address={user.address}
+          balanceRun={balanceRun}
+          status={rentStatus}
+        />
+        {children}
+        <Footer mode={menuStatus} />
+      </div>
     </div>
   );
 };
