@@ -22,7 +22,14 @@ const config: HardhatUserConfig = {
   },
   defaultNetwork: "hardhat",
   networks: {
-    hardhat: {}
+    hardhat: {},
+    polygon_mumbai: {
+      url: process.env.NODE_URL_TESTNET_POLYGON_MUMBAI,
+      accounts: [
+        process.env.PRIVATE_KEY_LENDER_TESTNET_POLYGON_MUMBAI!,
+        process.env.PRIVATE_KEY_RENTER_TESTNET_POLYGON_MUMBAI!
+      ],
+    },
   }
 };
 
