@@ -92,12 +92,14 @@ export default function PortfolioRebalancer(ssProp: PageProp) {
     // ----------------------------------------------------
     //          Permit Lit Action to use the PKP
     // ----------------------------------------------------
+    
     const contract = new LitContracts();
     await contract.connect();
 
     let addPermittedActionRes;
 
     try {
+      
       addPermittedActionRes =
         await contract.pkpPermissionsContractUtil.write.addPermittedAction(
           selectedPKP.tokenId,

@@ -202,7 +202,9 @@ export function Custom() {
     let authSig: JsonAuthSig;
     authSig = await LitJsSdk.checkAndSignAuthMessage({
       chain: "mumbai",
+      expiration: (60 * 60 * 24 * 7).toString(),
     });
+    
 
     // -- ok, let's test run the lit action code without params
     // try {

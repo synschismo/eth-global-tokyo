@@ -188,6 +188,11 @@ export function Custom() {
   };
 
   const runPipeline = async () => {
+    console.log("jsCode")
+    console.log(jsCode)
+    console.log("jsonCode")
+    console.log(jsonCode)
+    // return;
     const check_1 = validateParams("must_have", [
       {
         "Lit Action Code": jsCode,
@@ -228,7 +233,9 @@ export function Custom() {
     try {
       authSig = await LitJsSdk.checkAndSignAuthMessage({
         chain: "mumbai",
+        expiration: (60 * 60 * 24 * 7).toString(),
       });
+
 
       console.log("authSig:", authSig);
     } catch (e: any) {
@@ -284,6 +291,15 @@ export function Custom() {
       type: "LOADING",
       loadingMessage: "Submitting Job...",
     });
+    let param = {
+      ownerAddress: address,
+      pkpInfo: selectedPKP,
+      ipfsId: registerData.data.IpfsHash,
+      jsParams: jsonCode,
+      eventType: selectedEvent,
+      eventParams: eventState.data,
+    }
+    console.log("param", param)
 
     const submitData = await safeFetch(
       "/api/submit-job",
@@ -316,18 +332,23 @@ export function Custom() {
     // });
 
     // try {
-    //   const testRun = await litNodeClient.executeJs({
-    //     targetNodeRange: 1,
-    //     ipfsId: registerData.data.IpfsHash,
-    //     authSig: {
-    //       sig: "0xddb97f4cbbabce6a17286a83663d14e1d71615618957f49b63a0724de2e633ce55c7d40a0697e3bdede7835728d7780b8acdf4e9c671656ed2b76ef5bcf0f10e1c",
-    //       derivedVia: "web3.eth.personal.sign",
-    //       signedMessage:
-    //         "demo-encrypt-decrypt-react.vercel.app wants you to sign in with your Ethereum account:\n0x6581E39d310bD0C1B31Dcb215A9e673183bA7E93\n\n\nURI: https://demo-encrypt-decrypt-react.vercel.app/\nVersion: 1\nChain ID: 1\nNonce: HIzNO80hhLocavRgh\nIssued At: 2023-02-07T18:16:24.228Z\nExpiration Time: 2023-02-14T18:16:17.098Z",
-    //       address: "0x6581e39d310bd0c1b31dcb215a9e673183ba7e93",
-    //     },
-    //     jsParams,
-    //   });
+      // const testRun = await litNodeClient.executeJs({
+      //   targetNodeRange: 1,
+      //   // ipfsId: registerData.data.IpfsHash,
+      //   jsCode: `
+      //     const { LitJsSdk } = require("@lit-js/sdk");
+          
+
+      //   `,
+      //   authSig: {
+      //     sig: "0xddb97f4cbbabce6a17286a83663d14e1d71615618957f49b63a0724de2e633ce55c7d40a0697e3bdede7835728d7780b8acdf4e9c671656ed2b76ef5bcf0f10e1c",
+      //     derivedVia: "web3.eth.personal.sign",
+      //     signedMessage:
+      //       "demo-encrypt-decrypt-react.vercel.app wants you to sign in with your Ethereum account:\n0x6581E39d310bD0C1B31Dcb215A9e673183bA7E93\n\n\nURI: https://demo-encrypt-decrypt-react.vercel.app/\nVersion: 1\nChain ID: 1\nNonce: HIzNO80hhLocavRgh\nIssued At: 2023-02-07T18:16:24.228Z\nExpiration Time: 2023-02-14T18:16:17.098Z",
+      //     address: "0x6581e39d310bd0c1b31dcb215a9e673183ba7e93",
+      //   },
+      //   jsParams,
+      // });
 
     //   console.log("testRun:", testRun);
     // } catch (e: any) {

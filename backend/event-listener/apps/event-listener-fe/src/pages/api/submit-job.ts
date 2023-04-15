@@ -53,6 +53,8 @@ export default async function handler(
     // FIXME: atm. we will just remove the job and add it again
     // check if job.data.name === jobId
     if (job.data.name === jobId) {
+      console.log("job already exists")
+      console.log("removing job")
       // remove job
       job.remove();
 
@@ -205,7 +207,14 @@ export default async function handler(
       name: jobId,
       jobData,
     });
+    
     log.info(`waiting job id: ${job.id}`);
+    console.log(`waiting job id: ${job.id}`);
+    console.log("waitingList")
+    console.log(waitingList)
+    let jobs = (await blockEventWaitingList.getJobs(["waiting", "active"]));
+    console.log("jobs")
+    console.log(jobs)
   } catch (e: any) {
     console.log("error", e);
     res.status(500).json({
@@ -226,10 +235,12 @@ export default async function handler(
   );
 
   log.info(jobId);
+  console.log("submitted jobId");
+  console.log(jobId);
 
   res.status(200).json({
     data: {
-      message: "Hello World",
+      message: "job submitted. ALL DONE!",
     },
   });
 }
