@@ -138,7 +138,7 @@ const executeSwap = async ({ jsParams }) => {
     call: async (executeJsProps) => {
       const client = new LitNodeClient({
         litNetwork: "serrano",
-        debug: false,
+        debug: true,
       });
       await client.connect();
 

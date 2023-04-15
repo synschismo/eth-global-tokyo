@@ -52,7 +52,7 @@ export class BlockListener implements ActionListener {
     }
 
     if (!_args.rpcUrl) {
-      this.rpcUrl = "https://lit-protocol.calderachain.xyz/http";
+      this.rpcUrl = "https://matic-mumbai.chainstacklabs.com";
     }
 
     this.provider = new JsonRpcProvider(_args.rpcUrl ?? this.rpcUrl);
@@ -69,6 +69,8 @@ export class BlockListener implements ActionListener {
 
     const waitingList = this.waitingList;
     const provider = this.provider;
+    console.log("provider")
+    console.log(provider)
     const litNodeClient = this.litNodeClient;
     const serverAuthSig = this.serverAuthSig;
 
@@ -93,6 +95,10 @@ export class BlockListener implements ActionListener {
       // -- set requirement filter
       const requirement = (job: Bull.Job) => {
         const jobData = job.data.jobData as JobData;
+        console.log("jobData.eventParams")
+        console.log(jobData.eventParams)
+        console.log("BLOCK_NUMBER")
+        console.log(BLOCK_NUMBER)
 
         const requirements = new BlockEventRequirements(
           jobData.eventParams,
@@ -151,61 +157,66 @@ export class BlockListener implements ActionListener {
         // FIXME: refactor this
         const isRebalancer = jobName.toLowerCase().includes("mock_rebalancer");
 
-        if (isRebalancer) {
-          log.warning(`Rebalancer job detected, using custom logic`);
-          const ipfsId = jobData.ipfsId.split("-")[1];
-          log.warning(`ipfsId: ${ipfsId}`);
+        // if (isRebalancer) {
+        //   log.warning(`Rebalancer job detected, using custom logic`);
+        //   const ipfsId = jobData.ipfsId.split("-")[1];
+        //   log.warning(`ipfsId: ${ipfsId}`);
 
-          if (typeof jobData.jsParams === "string") {
-            jobData.jsParams = JSON.parse(jobData.jsParams);
-          }
+        //   if (typeof jobData.jsParams === "string") {
+        //     jobData.jsParams = JSON.parse(jobData.jsParams);
+        //   }
 
+        //   try {
+        //     // execute task
+        //     let res = await litNodeClient.executeJs({
+        //       ipfsId,
+        //       authSig: serverAuthSig,
+        //       jsParams: {
+        //         publicKey: (jobData.jsParams as any).pkpPublicKey,
+        //         // toSign: (jobData.jsParams as any).toSign,
+        //         sigName: "auto-return",
+        //         ...(jobData.jsParams as Object),
+        //       },
+        //     });
+
+        //     log.info(`Result: ${JSON.stringify(res)}`);
+
+        //     // try {
+        //     //   const rebalance = await runBalancePortfolio(
+        //     //     jobData.jsParams as any,
+        //     //     serverAuthSig,
+        //     //     ipfsId
+        //     //   );
+
+        //     //   log.info(`Rebalance result: ${JSON.stringify(rebalance)}`);
+        //     // } catch (e) {
+        //     //   log.error(`Error: ${e.message}`);
+        //     // }
+        //   } catch (e) {
+        //     log.error(`Error: ${e.message}`);
+        //   }
+
+        //   // return done();
+        // } else {
           try {
+            console.log("jobData")
+            console.log(jobData)
+            console.log("serverAuthSig")
+            console.log(serverAuthSig)
             // execute task
             let res = await litNodeClient.executeJs({
-              ipfsId,
-              authSig: serverAuthSig,
-              jsParams: {
-                publicKey: (jobData.jsParams as any).pkpPublicKey,
-                toSign: [1, 2, 3, 4, 5],
-                sigName: "portfolio-rebalancer-test",
-                ...(jobData.jsParams as Object),
-              },
-            });
-
-            log.info(`Result: ${JSON.stringify(res)}`);
-
-            try {
-              const rebalance = await runBalancePortfolio(
-                jobData.jsParams as any,
-                serverAuthSig,
-                ipfsId
-              );
-
-              log.info(`Rebalance result: ${JSON.stringify(rebalance)}`);
-            } catch (e) {
-              log.error(`Error: ${e.message}`);
-            }
-          } catch (e) {
-            log.error(`Error: ${e.message}`);
-          }
-
-          // return done();
-        } else {
-          try {
-            // execute task
-            let res = await litNodeClient.executeJs({
-              targetNodeRange: 1,
+              // targetNodeRange: 1,
               ipfsId: jobData.ipfsId,
               authSig: serverAuthSig,
-              jsParams: JSON.parse(jobData.jsParams),
+              // jsParams: JSON.parse(jobData.jsParams),
+              jsParams: jobData.jsParams,
             });
 
             log.info(`Result: ${JSON.stringify(res)}`);
           } catch (e) {
             log.error(`Error: ${e.message}`);
           }
-        }
+        // }
 
         // get block number
         let currentBlockNumber;

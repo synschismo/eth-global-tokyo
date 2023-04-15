@@ -4,9 +4,7 @@ export async function POST(request, res) {
     const { body } = request
     const { rentId } = body
 
-    
-
-    const rentalStorageAddress = "0x3D88436c1d23faabEc7B0BbEE794Ba638FF56129"
+    const rentalStorageAddress = "0x3D88436c1d23faabEc7B0BbEE794Ba638FF56129" // TODO: 本番環境用に変更する
 
     const provider = new providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com")
     const rentalStorage = new Contract(rentalStorageAddress, abi, provider)

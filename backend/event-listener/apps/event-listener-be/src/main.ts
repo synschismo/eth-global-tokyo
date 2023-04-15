@@ -11,12 +11,13 @@ dotenv.config();
 
 const litNodeClient = new LitJsSdk.LitNodeClient({
   litNetwork: "serrano",
-  debug: false,
+  debug: true,
 });
 
 const log = new Logger("[Main]");
 
 const bootstrap = async () => {
+  const chainId = 80001; // TODO: どのチェーンで署名するかによる？ここもEthereumに変える
   log.warning(`Bootstrapping...`);
 
   await litNodeClient.connect();
@@ -24,7 +25,7 @@ const bootstrap = async () => {
   LitJsSdk
   const serverAuthSig = await getWalletAuthSig({
     privateKey: process.env.SERVER_PRIVATE_KEY,
-    chainId: 80001,
+    chainId, // TODO: どのチェーンで署名するかによる？ここもEthereumに変える
   });
   log.warning(`Server AuthSig generated`);
 
@@ -35,6 +36,7 @@ const bootstrap = async () => {
     }),
     litNodeClient,
     serverAuthSig,
+    rpcUrl: "https://matic-mumbai.chainstacklabs.com", // TODO: ethereum mainnetにする
   });
 
 

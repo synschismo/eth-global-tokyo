@@ -142,7 +142,7 @@ export default async function handler(
     }
 
     // -- check block number
-    const provider = new JsonRpcProvider("https://chain-rpc.litprotocol.com/http");
+    const provider = new JsonRpcProvider("https://chain-rpc.litprotocol.com/http"); // TODO: ここも現在のブロックに置き換える ethreum
 
     const blockNumber = await provider.getBlockNumber();
 
@@ -194,8 +194,8 @@ export default async function handler(
 
   //  reset
   // clear queue
-  // await blockEventWaitingList.empty();
-  // await blockEventProcessingList.empty();
+  await blockEventWaitingList.empty();
+  await blockEventProcessingList.empty();
 
   // ---------------------------------------------------
   //          Add to Block Event Waiting List
