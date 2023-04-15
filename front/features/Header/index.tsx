@@ -48,8 +48,9 @@ export const Header: FC<Props> = ({
         ) : (
           <div className="bg-pink flex h-8 items-center justify-center rounded-full">
             <div className="px-4 font-bold text-white">Rent</div>
-            <div className="text-brown border-pink flex h-8 items-center justify-center rounded-full border bg-white px-4 font-bold">
-              {balanceRun ? balanceRun : balance}ETH
+            <div className=" text-brown border-pink flex h-8 w-[120px] items-center justify-end gap-1  rounded-full border bg-white px-4 font-bold">
+              <div>{balanceRun ? balanceRun : balance}</div>
+              <div>ETH</div>
             </div>
           </div>
         )}
