@@ -8,10 +8,17 @@ type Props = {
   address: string;
   balance: string;
   chainId: string;
+  balanceRun?: string;
   status: "available" | "rented";
 };
 
-export const Header: FC<Props> = ({ balance, chainId, address, status }) => {
+export const Header: FC<Props> = ({
+  balance,
+  chainId,
+  balanceRun,
+  address,
+  status,
+}) => {
   return (
     <div className="mx-4 flex h-16 items-center justify-between">
       {status === "available" ? (
@@ -36,13 +43,13 @@ export const Header: FC<Props> = ({ balance, chainId, address, status }) => {
         </div>
         {status === "available" ? (
           <div className="text-brown border-gray flex h-8 items-center justify-center rounded-full border px-4 font-bold">
-            {balance}ETH
+            {balanceRun ? balanceRun : balance}ETH
           </div>
         ) : (
           <div className="bg-pink flex h-8 items-center justify-center rounded-full">
             <div className="px-4 font-bold text-white">Rent</div>
             <div className="text-brown border-pink flex h-8 items-center justify-center rounded-full border bg-white px-4 font-bold">
-              {balance}ETH
+              {balanceRun ? balanceRun : balance}ETH
             </div>
           </div>
         )}

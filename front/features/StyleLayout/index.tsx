@@ -8,12 +8,14 @@ type Props = {
   children: React.ReactNode;
   rentStatus: "available" | "rented";
   menuStatus: "wallet" | "rental";
+  balanceRun?: string;
 };
 
 export const StyleLayout: FC<Props> = ({
   children,
   rentStatus,
   menuStatus,
+  balanceRun,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
   const user = userMock;
@@ -31,6 +33,7 @@ export const StyleLayout: FC<Props> = ({
         balance={user.balance}
         chainId={user.chainId}
         address={user.address}
+        balanceRun={balanceRun}
         status={rentStatus}
       />
       {children}

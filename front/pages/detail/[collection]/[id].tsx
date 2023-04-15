@@ -1,11 +1,12 @@
 import { StyleLayout } from "../../../features/StyleLayout";
 import Image from "next/image";
 import { chainToCurrencyImage } from "../../../utils/chainToCurrencyImage";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Listbox } from "@headlessui/react";
 import { IoIosArrowDown } from "react-icons/io";
 import { rentNftDetailMock } from "../../../mocks/rentNftDetailMock";
-import { userMock } from "../../../mocks/userMock";
+import { Button } from "../../../components/Button";
+import { round } from "../../../utils/round";
 
 const detail = () => {
   const nft = rentNftDetailMock;
@@ -19,9 +20,26 @@ const detail = () => {
   const [nowStatus, setNowStatus] = useState<"available" | "rented">(
     "available"
   );
+  const [balanceRun, setBalanceRun] = useState<number>(0.34);
+
+  useEffect(() => {
+    let interval: any = null;
+    if (nowStatus === "rented" && balanceRun > 0) {
+      interval = setInterval(() => {
+        setBalanceRun(round(balanceRun - 0.001, 4));
+      }, 1000);
+    } else if (nowStatus === "available" || balanceRun === 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [nowStatus, balanceRun]);
 
   return (
-    <StyleLayout rentStatus={nowStatus} menuStatus="rental">
+    <StyleLayout
+      rentStatus={nowStatus}
+      menuStatus="rental"
+      balanceRun={balanceRun.toString()}
+    >
       <div className="mx-4">
         <div className="relative aspect-square w-full rounded-2xl bg-slate-300">
           <Image
@@ -82,20 +100,18 @@ const detail = () => {
                   </Listbox.Options>
                 </Listbox>
               </div>
-              <div
-                onClick={() => setNowStatus("rented")}
-                className="bg-pink mx-4 mt-4 cursor-pointer rounded-2xl py-4 text-center font-bold text-white"
-              >
-                Rent Now
-              </div>
+              <Button
+                title="Rent Now"
+                doAction={() => setNowStatus("rented")}
+                color="#ed4b9e"
+              />
             </>
           ) : (
-            <div
-              onClick={() => setNowStatus("available")}
-              className="bg-brown mx-4 mt-4 cursor-pointer rounded-2xl py-4 text-center font-bold text-white"
-            >
-              Return Now
-            </div>
+            <Button
+              title="Return Now"
+              doAction={() => setNowStatus("available")}
+              color="#463a3f"
+            />
           )}
         </div>
       </div>
