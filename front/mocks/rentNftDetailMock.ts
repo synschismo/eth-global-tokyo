@@ -4,5 +4,5 @@ export const rentNftDetailMock = {
   image: "/sample.png",
   price: "5.3",
   chainId: "137",
-  status: "rented",
+  status: "available",
 };

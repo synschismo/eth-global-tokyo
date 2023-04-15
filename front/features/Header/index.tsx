@@ -8,13 +8,13 @@ type Props = {
   address: string;
   balance: string;
   chainId: string;
-  status: "noRent" | "rented";
+  status: "available" | "rented";
 };
 
 export const Header: FC<Props> = ({ balance, chainId, address, status }) => {
   return (
     <div className="mx-4 flex h-16 items-center justify-between">
-      {status === "noRent" ? (
+      {status === "available" ? (
         <div className="text-brown font-bold">StreamNFT</div>
       ) : (
         <div className="text-brown font-bold">Stream</div>
@@ -34,7 +34,7 @@ export const Header: FC<Props> = ({ balance, chainId, address, status }) => {
             <IoIosArrowDown />
           </div>
         </div>
-        {status === "noRent" ? (
+        {status === "available" ? (
           <div className="text-brown border-gray flex h-8 items-center justify-center rounded-full border px-4 font-bold">
             {balance}ETH
           </div>

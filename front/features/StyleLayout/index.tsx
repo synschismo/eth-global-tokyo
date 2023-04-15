@@ -1,12 +1,22 @@
 import { FC, useState } from "react";
 import { Modal } from "../../components/Modal";
+import { Header } from "../Header";
+import { userMock } from "../../mocks/userMock";
+import { Footer } from "../Footer";
 
 type Props = {
   children: React.ReactNode;
+  rentStatus: "available" | "rented";
+  menuStatus: "wallet" | "rental";
 };
 
-export const StyleLayout: FC<Props> = ({ children }) => {
+export const StyleLayout: FC<Props> = ({
+  children,
+  rentStatus,
+  menuStatus,
+}) => {
   const [isOpen, setIsOpen] = useState(true);
+  const user = userMock;
   return (
     <div className=" mx-auto min-h-screen max-w-[390px] bg-white">
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
@@ -17,7 +27,14 @@ export const StyleLayout: FC<Props> = ({ children }) => {
           </div>
         </div>
       </Modal>
+      <Header
+        balance={user.balance}
+        chainId={user.chainId}
+        address={user.address}
+        status={rentStatus}
+      />
       {children}
+      <Footer mode={menuStatus} />
     </div>
   );
 };

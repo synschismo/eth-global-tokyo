@@ -1,22 +1,12 @@
-import { Header } from "../../features/Header";
 import { StyleLayout } from "../../features/StyleLayout";
-import { Footer } from "../../features/Footer";
 import { CollectionCard } from "../../features/CollectionCard";
 import { RentNftCard } from "../../features/RentNftCard";
 import { rentNftsMock } from "../../mocks/rentNftsMock";
 import Link from "next/link";
-import { userMock } from "../../mocks/userMock";
 
 const detail = () => {
-  const user = userMock;
   return (
-    <StyleLayout>
-      <Header
-        balance={user.balance}
-        chainId={user.chainId}
-        address={user.balance}
-        status="noRent"
-      />
+    <StyleLayout rentStatus="available" menuStatus="rental">
       <div className="mt-8 flex justify-center">
         <CollectionCard
           collectionName="VeryLogAnimals"
@@ -53,7 +43,6 @@ const detail = () => {
             );
           })}
       </div>
-      <Footer mode="rental" />
     </StyleLayout>
   );
 };

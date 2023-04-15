@@ -1,6 +1,4 @@
-import { Header } from "../../../features/Header";
 import { StyleLayout } from "../../../features/StyleLayout";
-import { Footer } from "../../../features/Footer";
 import Image from "next/image";
 import { chainToCurrencyImage } from "../../../utils/chainToCurrencyImage";
 import { useState } from "react";
@@ -11,7 +9,6 @@ import { userMock } from "../../../mocks/userMock";
 
 const detail = () => {
   const nft = rentNftDetailMock;
-  const user = userMock;
   const people = [
     { id: 1, name: "infinite", unavailable: false },
     { id: 2, name: "1 day", unavailable: false },
@@ -19,15 +16,12 @@ const detail = () => {
     { id: 4, name: "1 month", unavailable: false },
   ];
   const [selectedPerson, setSelectedPerson] = useState(people[0]);
+  const [nowStatus, setNowStatus] = useState<"available" | "rented">(
+    "available"
+  );
 
   return (
-    <StyleLayout>
-      <Header
-        balance={user.balance}
-        chainId={user.chainId}
-        address={user.balance}
-        status="noRent"
-      />
+    <StyleLayout rentStatus={nowStatus} menuStatus="rental">
       <div className="mx-4">
         <div className="relative aspect-square w-full rounded-2xl bg-slate-300">
           <Image
@@ -62,7 +56,7 @@ const detail = () => {
               <div>/ minuets</div>
             </div>
           </div>
-          {nft.status === "available" ? (
+          {nowStatus === "available" ? (
             <>
               <div className="border-gray mx-4 mt-4 rounded-2xl border p-4 text-lg font-bold">
                 <Listbox value={selectedPerson} onChange={setSelectedPerson}>
@@ -88,19 +82,23 @@ const detail = () => {
                   </Listbox.Options>
                 </Listbox>
               </div>
-              <div className="bg-pink mx-4 mt-4 rounded-2xl py-4 text-center font-bold text-white">
+              <div
+                onClick={() => setNowStatus("rented")}
+                className="bg-pink mx-4 mt-4 cursor-pointer rounded-2xl py-4 text-center font-bold text-white"
+              >
                 Rent Now
               </div>
             </>
           ) : (
-            <div className="bg-brown mx-4 mt-4 rounded-2xl py-4 text-center font-bold text-white">
+            <div
+              onClick={() => setNowStatus("available")}
+              className="bg-brown mx-4 mt-4 cursor-pointer rounded-2xl py-4 text-center font-bold text-white"
+            >
               Return Now
             </div>
           )}
         </div>
       </div>
-
-      <Footer mode="rental" />
     </StyleLayout>
   );
 };

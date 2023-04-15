@@ -1,22 +1,14 @@
 import type { NextPage } from "next";
-import { Footer } from "../features/Footer";
 import { WalletNftCard } from "../features/WalletNftCard";
 import { StyleLayout } from "../features/StyleLayout";
 import { walletNftsMock } from "../mocks/walletNftsMock";
 import Avatar from "boring-avatars";
-import { Header } from "../features/Header";
 import { userMock } from "../mocks/userMock";
 
 const Home: NextPage = () => {
   const user = userMock;
   return (
-    <StyleLayout>
-      <Header
-        balance={user.balance}
-        chainId={user.chainId}
-        address={user.address}
-        status="noRent"
-      />
+    <StyleLayout rentStatus="available" menuStatus="wallet">
       <div className="pt-32">
         <div className="flex justify-center">
           <Avatar
@@ -54,7 +46,6 @@ const Home: NextPage = () => {
             );
           })}
       </div>
-      <Footer mode="wallet" />
     </StyleLayout>
   );
 };
