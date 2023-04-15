@@ -3,15 +3,32 @@ import { Footer } from "../features/Footer";
 import { WalletNftCard } from "../features/WalletNftCard";
 import { StyleLayout } from "../features/StyleLayout";
 import { walletNftsMock } from "../mocks/walletNftsMock";
+import Avatar from "boring-avatars";
+import { Header } from "../features/Header";
+import { userMock } from "../mocks/userMock";
 
 const Home: NextPage = () => {
+  const user = userMock;
   return (
     <StyleLayout>
+      <Header
+        balance={user.balance}
+        chainId={user.chainId}
+        address={user.address}
+        status="noRent"
+      />
       <div className="pt-32">
-        <div className="mx-auto h-20 w-20 rounded-full bg-gray-400"></div>
+        <div className="flex justify-center">
+          <Avatar
+            size={80}
+            name={user.address}
+            variant="marble"
+            colors={["#FF9EDC", "#A1D4FF"]}
+          />
+        </div>
         <div className="mt-8 flex justify-center">
           <div className="bg-pink rounded-full px-8 py-1 text-white">
-            0x00...0x00
+            {user.address.slice(0, 4) + "..." + user.address.slice(-4)}
           </div>
         </div>
         <div className="text-brown mt-4 text-center text-3xl font-bold">

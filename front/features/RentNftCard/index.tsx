@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { FC } from "react";
+import { chainToCurrencyImage } from "../../utils/chainToCurrencyImage";
 
 type Props = {
   collectionName: string;
@@ -33,13 +34,28 @@ export const RentNftCard: FC<Props> = ({
         <div className="text-gray text-[10px]">{collectionName}</div>
         <div className="text-brown text-xs font-bold">{name}</div>
       </div>
-      <div className="border-gray mx-2 mt-2 flex items-center justify-between border-t pt-1">
-        <div className="text-[10px]">Daily rental fee:</div>
-        <div className=" flex items-center justify-end gap-1">
-          <div className="h-3 w-3 rounded-full bg-gray-400"></div>
-          <div className="font-bold">{price}</div>
+      {status === "available" ? (
+        <div className="border-gray mx-2 mt-2 flex items-center justify-between border-t pt-1">
+          <div className="text-[10px]">Daily rental fee:</div>
+          <div className=" flex items-center justify-end gap-1">
+            <div className="relative h-[14px] w-[14px] rounded-full bg-gray-400">
+              <Image
+                className=""
+                src={chainToCurrencyImage(chainId)}
+                fill
+                style={{ objectFit: "cover", borderRadius: "50%" }}
+                alt=""
+              />
+            </div>
+            <div className="font-bold">{price}</div>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="border-gray mx-2 mt-2 flex items-center justify-between border-t pt-1">
+          <div className="text-[10px]">Status:</div>
+          <div className="text-pink text-sm font-bold">Rented Now</div>
+        </div>
+      )}
     </div>
   );
 };
