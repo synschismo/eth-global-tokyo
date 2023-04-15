@@ -40,12 +40,13 @@ const Home: NextPage = () => {
       </div>
       <div className="mx-3 mb-32 grid grid-cols-2 gap-y-4">
         {walletNftsMock &&
-          walletNftsMock.map((nft) => {
+          walletNftsMock.map((nft, index) => {
             const collectionName = nft.collectionName;
             const name = nft.name;
             const image = nft.image;
             return (
               <WalletNftCard
+                key={index}
                 collectionName={collectionName}
                 name={name}
                 image={image}
