@@ -9,7 +9,7 @@ type Props = {
 
 export const Footer: FC<Props> = ({ mode }) => {
   return (
-    <div className="fixed bottom-0 grid h-20 w-[390px] grid-cols-2 bg-white">
+    <div className="fixed bottom-0 z-50 grid h-20 w-[390px] grid-cols-2 bg-white">
       <div className="flex items-center justify-center">
         {mode == "wallet" ? (
           <div>

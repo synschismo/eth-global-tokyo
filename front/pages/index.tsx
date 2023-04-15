@@ -4,11 +4,31 @@ import { StyleLayout } from "../features/StyleLayout";
 import { walletNftsMock } from "../mocks/walletNftsMock";
 import Avatar from "boring-avatars";
 import { userMock } from "../mocks/userMock";
+import { useEffect, useState } from "react";
+import { round } from "../utils/round";
 
 const Home: NextPage = () => {
   const user = userMock;
+  const [balanceRun, setBalanceRun] = useState(0.35);
+
+  useEffect(() => {
+    let interval: any = null;
+    if (balanceRun > 0) {
+      interval = setInterval(() => {
+        setBalanceRun(round(balanceRun + 0.001, 4));
+      }, 1000);
+    } else if (balanceRun === 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [balanceRun]);
+
   return (
-    <StyleLayout rentStatus="available" menuStatus="wallet">
+    <StyleLayout
+      rentStatus="available"
+      menuStatus="wallet"
+      balanceRun={balanceRun.toString()}
+    >
       <div className="pt-32">
         <div className="flex justify-center">
           <Avatar
@@ -24,7 +44,7 @@ const Home: NextPage = () => {
           </div>
         </div>
         <div className="text-brown mt-4 text-center text-3xl font-bold">
-          0.035 ETH
+          {balanceRun.toString()} ETH
         </div>
       </div>
       <div className="border-gray text-gray mb-4 mt-12 border-b border-t px-2 py-4 text-center font-bold">
@@ -36,12 +56,14 @@ const Home: NextPage = () => {
             const collectionName = nft.collectionName;
             const name = nft.name;
             const image = nft.image;
+            const status = nft.status;
             return (
               <WalletNftCard
                 key={index}
                 collectionName={collectionName}
                 name={name}
                 image={image}
+                status={status}
               />
             );
           })}

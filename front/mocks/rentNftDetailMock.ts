@@ -4,7 +4,7 @@ export const rentNftDetailMock: RentNftDetailType = {
   collectionName: "VeryLongAnimals",
   name: "VeryLongAnimals #1",
   image: "/sample.png",
-  price: "5.3",
-  chainId: "137",
+  price: "0.01",
+  chainId: "1",
   status: "available",
 };

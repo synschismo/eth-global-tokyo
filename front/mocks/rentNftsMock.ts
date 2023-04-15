@@ -7,8 +7,8 @@ export const rentNftsMock: RentNftType[] = [
     name: "VeryLongAnimlas #72",
     tokenId: "1",
     image: "/sample.png",
-    price: "5.3",
-    chainId: "137",
+    price: "0.01",
+    chainId: "1",
     status: "available",
   },
   {
@@ -17,8 +17,8 @@ export const rentNftsMock: RentNftType[] = [
     name: "VeryLongAnimlas #72",
     tokenId: "1",
     image: "/sample.png",
-    price: "5.3",
-    chainId: "137",
+    price: "0.01",
+    chainId: "1",
     status: "available",
   },
   {
@@ -27,8 +27,8 @@ export const rentNftsMock: RentNftType[] = [
     name: "VeryLongAnimlas #72",
     tokenId: "1",
     image: "/sample.png",
-    price: "5.3",
-    chainId: "137",
+    price: "0.01",
+    chainId: "1",
     status: "available",
   },
   {
@@ -37,8 +37,8 @@ export const rentNftsMock: RentNftType[] = [
     name: "VeryLongAnimlas #72",
     tokenId: "1",
     image: "/sample.png",
-    price: "5.3",
-    chainId: "137",
+    price: "0.01",
+    chainId: "1",
     status: "available",
   },
 ];
