@@ -1,0 +1,18 @@
+{
+  "name": "playground-nodejs",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node select.mjs",
+    "main": "nodemon --watch src --ext js,ts --exec \"tsx src/main.mjs\""
+  },
+  "dependencies": {
+    "@lit-dev/lit-actions": "*",
+    "@lit-dev/tools": "*",
+    "@lit-dev/utils": "*",
+    "@lit-protocol/lit-node-client": "^2.1.16",
+    "@lit-protocol/pkp-ethers.js-node": "^5.7.48",
+    "dotenv": "^16.0.3",
+    "ethers": "^5.7.2"
+  }
+}
