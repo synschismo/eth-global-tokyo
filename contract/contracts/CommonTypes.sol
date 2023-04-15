@@ -6,7 +6,7 @@ library CommonTypes {
     address lenderWallet;
     address tokenAddress;
     uint256 tokenId;
-    uint256 feePerSec;
+    int96 flowRate;
   }
 
   struct RentInfo {
@@ -15,5 +15,6 @@ library CommonTypes {
     uint256 tokenId;
     address renterWallet;
     uint256 startedAt;
+    uint256 returnAt;
   }
 }
