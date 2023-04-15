@@ -6,7 +6,7 @@ export const rentNftsMock: RentNftType[] = [
     collectionAddress: "0x123",
     name: "VeryLongAnimlas #4",
     tokenId: "1",
-    image: "/image/sample3.png",
+    image: "/image/sample8.png",
     price: "0.01",
     chainId: "1",
     status: "available",
