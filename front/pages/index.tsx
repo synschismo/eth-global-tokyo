@@ -6,11 +6,90 @@ import Avatar from "boring-avatars";
 import { userMock } from "../mocks/userMock";
 import { useEffect, useState } from "react";
 import { walletRentsMock } from "../mocks/walletRentMock";
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client/core";
+import { UserNftType } from "../types/UserNftType";
 
 const Home: NextPage = () => {
   const user = userMock;
   const [balanceRun, setBalanceRun] = useState(0.35);
   const [status, setStatus] = useState<"rent" | "mynfts">("rent");
+  const [userNfts, setUserNfts] = useState(null);
+
+  useEffect(() => {
+    const AIRSTACK_ENDPOINT = "https://api.airstack.xyz/gql";
+    const AIRSTACK_API_KEY = process.env.NEXT_PUBLIC_AIRSTACK_KEY
+      ? process.env.NEXT_PUBLIC_AIRSTACK_KEY
+      : "";
+
+    const client = new ApolloClient({
+      uri: AIRSTACK_ENDPOINT,
+      cache: new InMemoryCache(),
+      headers: { Authorization: AIRSTACK_API_KEY },
+    });
+
+    const f = async () => {
+      const query = gql`
+        query MyQuery($cursor: String, $owners: [Identity!], $limit: Int) {
+          TokenBalances(
+            input: {
+              filter: {
+                owner: { _in: $owners }
+                tokenType: { _in: [ERC1155, ERC721] }
+              }
+              blockchain: polygon
+              limit: $limit
+              cursor: $cursor
+            }
+          ) {
+            TokenBalance {
+              amount
+              chainId
+              id
+              lastUpdatedBlock
+              lastUpdatedTimestamp
+              owner {
+                addresses
+              }
+              tokenAddress
+              tokenId
+              tokenType
+              token {
+                name
+                symbol
+              }
+            }
+            pageInfo {
+              prevCursor
+              nextCursor
+            }
+          }
+        }
+      `;
+
+      const response = await client.query({
+        query,
+        variables: {
+          owners: ["0x5eFd4B32c4ccbB09912f3Db83Bc43FD33E239f09"],
+          limit: 10,
+          cursor: "",
+        },
+      });
+      // console.log(response);
+      const data = response.data.TokenBalances.TokenBalance.map(
+        (token: any) => {
+          const tmpDate: UserNftType = {
+            name: "",
+            image: "",
+            collectionName: token.token.name,
+            status: "available",
+          };
+          return tmpDate;
+        }
+      );
+      setUserNfts(data);
+    };
+    f();
+  }, []);
 
   useEffect(() => {
     let interval: any = null;
