@@ -4,7 +4,7 @@ export const walletRentsMock: UserNftType[] = [
   {
     collectionName: "VeryLongAnimals",
     name: "VeryLongAnimals #1",
-    image: "/sample.png",
+    image: "/sample8.png",
     status: "available",
   },
 ];

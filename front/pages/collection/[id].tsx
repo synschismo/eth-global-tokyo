@@ -10,8 +10,8 @@ const detail = () => {
       <div className="mt-8 flex justify-center">
         <CollectionCard
           collectionName="VeryLogAnimals"
-          coverImage="/sample.png"
-          logoImage="/sample.png"
+          coverImage="/vla_bg.jpg"
+          logoImage="/vla_logo.jpg"
           description="GBC is a generative 10,000 Blueberries NFT collection on Arbitrum dedicated to GMX..."
         />
       </div>

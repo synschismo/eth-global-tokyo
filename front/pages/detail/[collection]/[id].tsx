@@ -1,13 +1,12 @@
 import { StyleLayout } from "../../../features/StyleLayout";
 import Image from "next/image";
-import { chainToCurrencyImage } from "../../../utils/chainToCurrencyImage";
 import { useEffect, useState } from "react";
 import { rentNftDetailMock } from "../../../mocks/rentNftDetailMock";
 import { Button } from "../../../components/Button";
-import { round } from "../../../utils/round";
 import { SelectRangeToggle } from "../../../features/SelectRangeToggle";
 import { ModalRentReturn } from "../../../features/ModalRentReturn";
 import { ModalRentSuccess } from "../../../features/ModalRentSuccess";
+import { RentPriceCard } from "../../../features/RentPriceCard";
 
 const detail = () => {
   const nft = rentNftDetailMock;
@@ -73,22 +72,7 @@ const detail = () => {
       <div className="mx-4 mt-4 pb-32">
         <div className="border-gray w-full rounded-2xl border pb-4">
           <div></div>
-          <div className="bg-gray text-gray mx-4 mt-4 rounded-2xl p-4">
-            <div>Price</div>
-            <div className="mt-2 flex items-center justify-start gap-3">
-              <div className="relative h-5 w-5 rounded-full">
-                <Image
-                  className=""
-                  src={chainToCurrencyImage(nft.chainId)}
-                  fill
-                  style={{ objectFit: "cover", borderRadius: "50%" }}
-                  alt=""
-                />
-              </div>
-              <div className="text-brown text-3xl font-bold">{nft.price}</div>
-              <div>/ minuets</div>
-            </div>
-          </div>
+          <RentPriceCard chainId={nft.chainId} price={nft.price} />
           {nowStatus === "available" ? (
             <>
               <SelectRangeToggle

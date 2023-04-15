@@ -5,7 +5,6 @@ import { walletNftsMock } from "../mocks/walletNftsMock";
 import Avatar from "boring-avatars";
 import { userMock } from "../mocks/userMock";
 import { useEffect, useState } from "react";
-import { round } from "../utils/round";
 import { walletRentsMock } from "../mocks/walletRentMock";
 
 const Home: NextPage = () => {
