@@ -1,3 +1,7 @@
+# event-listner 
+
+this is cloned & customized directory from https://github.com/LIT-Protocol/lit-apps
+
 # Prerequisite
 
 ```
