@@ -6,7 +6,7 @@ type Props = {};
 export const CollectionCard: FC<Props> = ({}) => {
   return (
     <div className="bg-gray h-[242px] w-[343px] rounded-lg">
-      <div className="h-[94px] w-[343] rounded-lg bg-gray-300">
+      <div className="h-[94px] w-[343] rounded-t-lg bg-gray-300">
         <Image
           className=""
           src={"/images/1.png"}
