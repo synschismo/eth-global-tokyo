@@ -6,4 +6,6 @@ interface IRentalStorage {
     address _to,
     bytes calldata _data
   ) external view returns (bool);
+
+  function onReturned(uint256 _rentId) external;
 }

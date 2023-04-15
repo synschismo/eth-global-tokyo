@@ -4,7 +4,8 @@ pragma solidity ^0.8.18;
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+// import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {ISuperfluid, ISuperToken, SuperAppDefinitions} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
@@ -12,15 +13,21 @@ import {IConstantFlowAgreementV1} from "@superfluid-finance/ethereum-contracts/c
 import {CFAv1Library} from "@superfluid-finance/ethereum-contracts/contracts/apps/CFAv1Library.sol";
 import {SuperAppBase} from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperAppBase.sol";
 
-import "./RentalStorage.sol";
+import "./IRentalStorage.sol";
 import "./IWallet.sol";
 import {CommonTypes} from "./CommonTypes.sol";
 
-contract Wallet is Ownable, SuperAppBase, IWallet {
+contract Wallet is SuperAppBase, Initializable, IWallet {
   using ECDSA for bytes32;
   using Address for address;
 
-  RentalStorage public rentalStorage;
+  address public owner;
+  modifier onlyOwner {
+    require(msg.sender == owner, "Wallet: only owner can call this function");
+    _;
+  }
+
+  IRentalStorage public rentalStorage;
   modifier onlyRentalStorage {
     require(msg.sender == address(rentalStorage), "Wallet: only RentalStorage can call this function");
     _;
@@ -41,7 +48,7 @@ contract Wallet is Ownable, SuperAppBase, IWallet {
   ISuperToken public usdcX;
 
   constructor (
-    RentalStorage _rentalStorage,
+    IRentalStorage _rentalStorage,
     ISuperfluid _hostSuperfluid,
     IERC20 _usdc,
     ISuperToken _usdcX
@@ -67,6 +74,12 @@ contract Wallet is Ownable, SuperAppBase, IWallet {
             SuperAppDefinitions.AFTER_AGREEMENT_UPDATED_NOOP |
             SuperAppDefinitions.BEFORE_AGREEMENT_TERMINATED_NOOP
     );
+
+    _disableInitializers();
+  }
+
+  function initialize(address _owner) public initializer {
+    owner = _owner;
   }
 
   function execute(
@@ -145,7 +158,7 @@ contract Wallet is Ownable, SuperAppBase, IWallet {
     bytes memory _signature
   ) public view override returns (bytes4) {
     address signer = _hash.recover(_signature);
-    if (owner() == signer) {
+    if (owner == signer) {
       return IERC1271.isValidSignature.selector;
     } else {
       return 0xffffffff;

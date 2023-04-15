@@ -10,10 +10,8 @@ let sf: Framework;
 let dai: any;
 let daix: SuperToken;
 
-const thousandEther = ethers.utils.parseEther("10000")
-
 before(async () => {
-  const [owner, user1, user2] = await ethers.getSigners();
+  const [owner] = await ethers.getSigners();
 
   const sfDeployer = await deployTestFramework();
   const contractsFramework = await sfDeployer.getFramework();
@@ -53,10 +51,15 @@ describe("StreamNFT", () => {
 
     describe("execute", () => {
       it("reverts renting NFT transfer");
+
       it("reverts listing NFT transfer");
 
-      it("call RentalStorage.list");
+      it("call RentalStorage.list", async () => {
+        // TODO
+      });
+
       it("call RentalStorage.unList");
+
       it("call RentalStorage.rent");
     });
 
@@ -69,7 +72,28 @@ describe("StreamNFT", () => {
   });
 
   describe("WalletFactory", () => {
-    it("createWallet");
+    it("createWallet", async () => {
+      const [owner] = await ethers.getSigners();
+      const RentalStorage = await ethers.getContractFactory("RentalStorage");
+      const rentalStorage = await RentalStorage.deploy();
+
+      const WalletFactory = await ethers.getContractFactory("WalletFactory");
+      const walletFactory = await WalletFactory.deploy(
+        rentalStorage.address,
+        sf.host.contract.address,
+        dai.address,
+        daix.address
+      );
+
+      const walletAddress = await walletFactory.getAddress(owner.address);
+      expect(await ethers.provider.getCode(walletAddress)).to.equal("0x");
+
+      await expect(walletFactory.createWallet(owner.address)).to.be.not.reverted;
+
+      const Wallet = await ethers.getContractFactory("Wallet");
+      const deployedWallet = Wallet.attach(walletAddress);
+      expect(await deployedWallet.owner()).to.be.equal(owner.address);
+    });
   });
 
   describe("RentalStorage", () => {
