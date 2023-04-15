@@ -98,6 +98,10 @@ contract RentalStorage is Ownable, IRentalStorage {
     return rentId;
   }
 
+  function returnScheduledRent(uint256 rentId) external onlyOwner {
+    // TODO
+  }
+
   function onReturned(uint256 _rentId) external {
     // TODO: check nft owner
 
