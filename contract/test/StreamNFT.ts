@@ -1,4 +1,4 @@
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
@@ -114,7 +114,7 @@ describe("StreamNFT", () => {
       // ==========================
       // rent & unList
       // ==========================
-      const rentCallData = rentalStorage.interface.encodeFunctionData("rent", [lendId]);
+      const rentCallData = rentalStorage.interface.encodeFunctionData("rent", [lendId, 0]);
 
       await dai.mint(user1Wallet.address, 100000000000);
       await expect(user1Wallet.connect(user1).upgradeUSDCx(8000000000)).to.be.not.reverted;
@@ -176,7 +176,6 @@ describe("StreamNFT", () => {
 
   describe("WalletFactory", () => {
     it("createWallet", async () => {
-      // const {owner, rentalStorage, walletFactory, Wallet} = await loadFixture(deployContractsFixture);
       const {
         sf, dai, daix,
       } = await loadFixture(deployContractsFixture);
@@ -210,6 +209,58 @@ describe("StreamNFT", () => {
   });
 
   describe("RentalStorage", () => {
-    it("returnScheduledRent");
+    it("returnScheduledRent", async () => {
+      const {
+        sf, dai, daix,
+        owner, user1, user2,
+        ownerWallet, user1Wallet, user2Wallet,
+        rentalStorage,
+        testERC721,
+      } = await loadFixture(deployContractsFixture);
+
+      await testERC721.mint(ownerWallet.address, 1);
+      expect(await testERC721.ownerOf(1)).to.be.equal(ownerWallet.address);
+
+      const listCallData = rentalStorage.interface.encodeFunctionData("list", [
+        testERC721.address, // token address
+        1, // token id
+        1, // flow rate
+      ]);
+
+      await expect(ownerWallet.execute(rentalStorage.address, 0, listCallData)).to.be.not.reverted;
+
+      const lendId = await rentalStorage.lendIds(testERC721.address, 1);
+      expect(lendId).to.be.not.equal(0);
+      const lendInfo = await rentalStorage.lendInfoList(lendId);
+      expect(lendInfo.lenderWallet).to.be.equal(ownerWallet.address);
+      expect(lendInfo.tokenAddress).to.be.equal(testERC721.address);
+      expect(lendInfo.tokenId).to.be.equal(1);
+
+      await expect(ownerWallet.execute(rentalStorage.address, 0, listCallData)).to.be.reverted;
+
+      // ==========================
+      // rent
+      // ==========================
+      const now = await time.latest();
+      const rentCallData = rentalStorage.interface.encodeFunctionData("rent", [lendId, now + 3600]);
+
+      await dai.mint(user1Wallet.address, 100000000000);
+      await expect(user1Wallet.connect(user1).upgradeUSDCx(8000000000)).to.be.not.reverted;
+      expect(await daix.balanceOf({account: user1Wallet.address, providerOrSigner: user1})).to.be.equal("8000000000");
+
+      await expect(user1Wallet.connect(user1).execute(rentalStorage.address, 0, rentCallData)).to.be.not.reverted;
+      expect(await testERC721.ownerOf(1)).to.be.equal(user1Wallet.address);
+      const rentId = await rentalStorage.rentIds(testERC721.address, 1);
+      expect(rentId).to.be.not.equal(0);
+      const rentInfo = await rentalStorage.rentInfoList(rentId);
+      expect(rentInfo.renterWallet).to.be.equal(user1Wallet.address);
+      expect(rentInfo.tokenAddress).to.be.equal(testERC721.address);
+      expect(rentInfo.tokenId).to.be.equal(1);
+
+      await time.increase(3601);
+      await expect(rentalStorage.returnScheduledRent(rentId)).to.be.not.reverted;
+      expect(await testERC721.ownerOf(1)).to.be.equal(ownerWallet.address);
+      expect(await rentalStorage.rentIds(testERC721.address, 1)).to.be.equal(0);
+    });
   });
 });

@@ -15,5 +15,6 @@ library CommonTypes {
     uint256 tokenId;
     address renterWallet;
     uint256 startedAt;
+    uint256 returnAt;
   }
 }

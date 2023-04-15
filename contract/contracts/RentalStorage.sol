@@ -2,6 +2,7 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 
 import "./WalletFactory.sol";
 import "./Wallet.sol";
@@ -58,9 +59,41 @@ contract RentalStorage is Ownable, IRentalStorage {
 
   function validateExecution(
     address _to,
-    bytes calldata _data
+    bytes memory _data
   ) external view override returns (bool) {
     // parse _data and detect selector (approve/transfer/burn) and tokenId
+    bytes4 selector;
+    assembly {
+      selector := mload(add(_data, 0x20))
+    }
+
+    // TODO: parse tokenId from call data
+    uint256 tokenId;
+    if (selector == IERC721.transferFrom.selector ||
+        selector == bytes4(keccak256("safeTransferFrom(address,address,uint256,bytes)")) ||
+        selector == bytes4(keccak256("safeTransferFrom(address,address,uint256)"))) {
+      assembly {
+        tokenId := mload(add(_data, 0x80))
+      }
+    }
+    if (selector == IERC721.setApprovalForAll.selector) {
+      return false;
+    }
+    if (selector == IERC721.approve.selector) {
+      assembly {
+        tokenId := mload(add(_data, 0x40))
+      }
+    }
+    if (selector == bytes4(keccak256("burn(uint256)"))) {
+      assembly {
+        tokenId := mload(add(_data, 0x40))
+      }
+    }
+
+    CommonTypes.LendInfo memory lendInfo = lendInfoList[lendIds[_to][tokenId]];
+    if (lendInfo.lenderWallet != address(0)) {
+      return false;
+    }
 
     return true;
   }
@@ -101,7 +134,7 @@ contract RentalStorage is Ownable, IRentalStorage {
     delete lendInfoList[lendId];
   }
 
-  function rent(uint256 lendId) external onlyRegisteredWallet returns (uint256 rentId) {
+  function rent(uint256 lendId, uint256 returnAt) external onlyRegisteredWallet returns (uint256 rentId) {
     Wallet renterWallet = Wallet(payable(msg.sender));
 
     CommonTypes.LendInfo memory lendInfo = lendInfoList[lendId];
@@ -128,14 +161,19 @@ contract RentalStorage is Ownable, IRentalStorage {
       lendInfo.tokenAddress,
       lendInfo.tokenId,
       address(renterWallet),
-      block.timestamp
+      block.timestamp,
+      returnAt
     );
 
     return rentId;
   }
 
   function returnScheduledRent(uint256 rentId) external onlyOwner {
-    // TODO
+    CommonTypes.RentInfo memory rentInfo = rentInfoList[rentId];
+    require(rentInfo.renterWallet != address(0), "Wallet: rentId not found");
+    require(rentInfo.returnAt > 0 && rentInfo.returnAt < block.timestamp, "Wallet: returnAt is not passed");
+
+    Wallet(payable(rentInfo.renterWallet)).returnRentItemByOrg(rentId);
   }
 
   function onReturned(uint256 _rentId) external onlyRegisteredWallet {
