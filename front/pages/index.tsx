@@ -15,8 +15,8 @@ const Home: NextPage = () => {
     let interval: any = null;
     if (balanceRun > 0) {
       interval = setInterval(() => {
-        setBalanceRun(round(balanceRun + 0.001, 4));
-      }, 1000);
+        setBalanceRun(balanceRun + 0.0001);
+      }, 100);
     } else if (balanceRun === 0) {
       clearInterval(interval);
     }
@@ -27,7 +27,7 @@ const Home: NextPage = () => {
     <StyleLayout
       rentStatus="available"
       menuStatus="wallet"
-      balanceRun={balanceRun.toString()}
+      balanceRun={balanceRun.toFixed(4).toString()}
     >
       <div className="pt-32">
         <div className="flex justify-center">
@@ -44,7 +44,7 @@ const Home: NextPage = () => {
           </div>
         </div>
         <div className="text-brown mt-4 text-center text-3xl font-bold">
-          {balanceRun.toString()} ETH
+          {balanceRun.toFixed(4).toString()} ETH
         </div>
       </div>
       <div className="border-gray text-gray mb-4 mt-12 border-b border-t px-2 py-4 text-center font-bold">

@@ -39,7 +39,7 @@ export const StyleLayout: FC<Props> = ({
         </Modal>
         <div className="pt-14">
           <Header
-            balance={user.balance}
+            balance={Number(user.balance).toFixed(5).toString()}
             chainId={user.chainId}
             address={user.address}
             balanceRun={balanceRun}

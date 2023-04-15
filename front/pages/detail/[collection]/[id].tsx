@@ -29,8 +29,8 @@ const detail = () => {
     let interval: any = null;
     if (nowStatus === "rented" && balanceRun > 0) {
       interval = setInterval(() => {
-        setBalanceRun(round(balanceRun - 0.001, 4));
-      }, 1000);
+        setBalanceRun(balanceRun - 0.0001);
+      }, 100);
     } else if (nowStatus === "available" || balanceRun === 0) {
       clearInterval(interval);
     }
@@ -41,7 +41,7 @@ const detail = () => {
     <StyleLayout
       rentStatus={nowStatus}
       menuStatus="rental"
-      balanceRun={balanceRun.toString()}
+      balanceRun={balanceRun.toFixed(4).toString()}
     >
       <ModalRentSuccess
         isOpen={isSuccessModal}
