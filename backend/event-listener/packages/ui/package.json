@@ -1,0 +1,36 @@
+{
+  "name": "ui",
+  "version": "0.0.0",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "license": "MIT",
+  "scripts": {
+    "lint": "TIMING=1 eslint \"**/*.ts*\""
+  },
+  "devDependencies": {
+    "@radix-ui/react-alert-dialog": "^1.0.2",
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
+    "eslint": "^7.32.0",
+    "eslint-config-custom": "*",
+    "react": "^18.2.0",
+    "tsconfig": "*",
+    "typescript": "^4.5.2"
+  },
+  "dependencies": {
+    "@lit-dev/utils": "*",
+    "@lit-protocol/contracts-sdk": "^2.1.121",
+    "@radix-ui/colors": "^0.1.8",
+    "@radix-ui/react-alert-dialog": "^1.0.2",
+    "@radix-ui/react-icons": "^1.1.1",
+    "@radix-ui/react-label": "^2.0.0",
+    "@radix-ui/react-navigation-menu": "^1.1.1",
+    "@radix-ui/react-popover": "^1.0.3",
+    "@radix-ui/react-radio-group": "^1.1.1",
+    "@radix-ui/react-select": "^1.2.0",
+    "@radix-ui/react-toast": "^1.1.2",
+    "ethers": "^5",
+    "react-hot-toast": "^2.4.0",
+    "wagmi": "^0.11.4"
+  }
+}

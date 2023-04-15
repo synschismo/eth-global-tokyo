@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "lib": ["ES2021.String", "DOM", ]
+  },
+  "include": ["."],
+  "exclude": ["dist", "build", "node_modules"]
+}
