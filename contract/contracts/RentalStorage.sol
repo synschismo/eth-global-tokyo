@@ -71,7 +71,6 @@ contract RentalStorage is Ownable, IRentalStorage {
     int96 flowRate
   ) external onlyRegisteredWallet returns (uint256 lendId) {
     require(flowRate > 0, "Wallet: feePerSec must be greater than 0");
-    // require(ownerByWallet[msg.sender] != address(0), "Wallet: not registered wallet");
 
     lendId = ++lendNonce;
 
@@ -103,7 +102,6 @@ contract RentalStorage is Ownable, IRentalStorage {
   }
 
   function rent(uint256 lendId) external onlyRegisteredWallet returns (uint256 rentId) {
-    console.log("[RentalStorage.rent]", lendId);
     Wallet renterWallet = Wallet(payable(msg.sender));
 
     CommonTypes.LendInfo memory lendInfo = lendInfoList[lendId];

@@ -6,34 +6,6 @@ import { Framework, SuperToken } from "@superfluid-finance/sdk-core";
 import { deployTestFramework } from "@superfluid-finance/ethereum-contracts/dev-scripts/deploy-test-framework";
 import TestToken from "@superfluid-finance/ethereum-contracts/build/contracts/TestToken.json";
 
-// let sf: Framework;
-// let dai: any;
-// let daix: SuperToken;
-
-// before(async () => {
-//   const [owner] = await ethers.getSigners();
-
-//   const sfDeployer = await deployTestFramework();
-//   const contractsFramework = await sfDeployer.getFramework();
-//   sf = await Framework.create({
-//     chainId: 31337,
-//     provider: owner.provider,
-//     resolverAddress: contractsFramework.resolver,
-//     protocolReleaseVersion: "test"
-//   });
-
-//   const tokenDeployment = await sfDeployer.deployWrapperSuperToken(
-//     "Fake DAI Token",
-//     "fDAI",
-//     18,
-//     ethers.utils.parseEther("1000000000000").toString()
-//   );
-
-//   daix = await sf.loadSuperToken("fDAIx");
-//   if (daix.underlyingToken === undefined) throw new Error("daix.underlyingToken is undefined");
-//   dai = new ethers.Contract(daix.underlyingToken.address, TestToken.abi, owner);
-// });
-
 describe("StreamNFT", () => {
   const deployContractsFixture = async () => {
     const [owner, user1, user2] = await ethers.getSigners();
@@ -123,9 +95,9 @@ describe("StreamNFT", () => {
       // list
       // ==========================
       const listCallData = rentalStorage.interface.encodeFunctionData("list", [
-        testERC721.address,
-        1,
-        1,
+        testERC721.address, // token address
+        1, // token id
+        1, // flow rate
       ]);
 
       await expect(ownerWallet.execute(rentalStorage.address, 0, listCallData)).to.be.not.reverted;
@@ -144,31 +116,37 @@ describe("StreamNFT", () => {
       // ==========================
       const rentCallData = rentalStorage.interface.encodeFunctionData("rent", [lendId]);
 
-      await dai.mint(user1Wallet.address, 1000000);
-      await expect(user1Wallet.connect(user1).upgradeUSDCx(80000)).to.be.not.reverted;
-      expect(await daix.balanceOf({account: user1Wallet.address, providerOrSigner: user1})).to.be.equal("80000");
+      await dai.mint(user1Wallet.address, 100000000000);
+      await expect(user1Wallet.connect(user1).upgradeUSDCx(8000000000)).to.be.not.reverted;
+      expect(await daix.balanceOf({account: user1Wallet.address, providerOrSigner: user1})).to.be.equal("8000000000");
 
       await expect(user1Wallet.connect(user1).execute(rentalStorage.address, 0, rentCallData)).to.be.not.reverted;
-      // expect(await testERC721.ownerOf(1)).to.be.equal(user1Wallet.address);
-      // const rentId = await rentalStorage.rentIds(testERC721.address, 1);
-      // expect(rentId).to.be.not.equal(0);
-      // const rentInfo = await rentalStorage.rentInfoList(rentId);
-      // expect(rentInfo.renterWallet).to.be.equal(user1Wallet.address);
-      // expect(rentInfo.tokenAddress).to.be.equal(testERC721.address);
-      // expect(rentInfo.tokenId).to.be.equal(1);
+      expect(await testERC721.ownerOf(1)).to.be.equal(user1Wallet.address);
+      const rentId = await rentalStorage.rentIds(testERC721.address, 1);
+      expect(rentId).to.be.not.equal(0);
+      const rentInfo = await rentalStorage.rentInfoList(rentId);
+      expect(rentInfo.renterWallet).to.be.equal(user1Wallet.address);
+      expect(rentInfo.tokenAddress).to.be.equal(testERC721.address);
+      expect(rentInfo.tokenId).to.be.equal(1);
 
-      // // cannot rent an item that is already rented
-      // await dai.mint(user2Wallet.address, 1000000);
-      // await expect(user2Wallet.connect(user2).upgradeUSDCx(80000)).to.be.not.reverted;
-      // expect(await daix.balanceOf({account: user2Wallet.address, providerOrSigner: user2})).to.be.equal("80000");
-      // await expect(user2Wallet.connect(user2).execute(rentalStorage.address, 0, rentCallData)).to.be.reverted;
+      // cannot rent an item that is already rented
+      await dai.mint(user2Wallet.address, 1000000);
+      await expect(user2Wallet.connect(user2).upgradeUSDCx(80000)).to.be.not.reverted;
+      expect(await daix.balanceOf({account: user2Wallet.address, providerOrSigner: user2})).to.be.equal("80000");
+      await expect(user2Wallet.connect(user2).execute(rentalStorage.address, 0, rentCallData)).to.be.reverted;
 
-      // // cannot unlist when rented
-      // const unListCallData = rentalStorage.interface.encodeFunctionData("unList", [lendId]);
-      // await expect(ownerWallet.execute(rentalStorage.address, 0, unListCallData)).to.be.reverted;
+      // cannot unlist when rented
+      const unListCallData = rentalStorage.interface.encodeFunctionData("unList", [lendId]);
+      await expect(ownerWallet.execute(rentalStorage.address, 0, unListCallData)).to.be.reverted;
 
       // return renting item
-      // await expect(user1Wallet.returnRentItem(rentId)).to.be.not.reverted;
+      await expect(user1Wallet.connect(user1).returnRentItem(rentId)).to.be.not.reverted;
+      expect(await testERC721.ownerOf(1)).to.be.equal(ownerWallet.address);
+      expect(await rentalStorage.rentIds(testERC721.address, 1)).to.be.equal(0);
+
+      // unlist
+      await expect(ownerWallet.execute(rentalStorage.address, 0, unListCallData)).to.be.not.reverted;
+      expect(await rentalStorage.lendIds(testERC721.address, 1)).to.be.equal(0);
     });
 
     describe("execute", () => {

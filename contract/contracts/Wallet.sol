@@ -110,7 +110,8 @@ contract Wallet is SuperAppBase, Ownable, IWallet {
     require(rentInfo.renterWallet == address(this), "Wallet: not renter");
     CommonTypes.LendInfo memory lendInfo = rentalStorage.getLendInfo(rentInfo.lendId);
 
-    // TODO: stop superflow
+    // stop superflow
+    cfaV1.deleteFlow(address(this), lendInfo.lenderWallet, usdcX);
 
     // transfer
     try IERC721(rentInfo.tokenAddress).safeTransferFrom(address(this), lendInfo.lenderWallet, rentInfo.tokenId) {
@@ -124,18 +125,17 @@ contract Wallet is SuperAppBase, Ownable, IWallet {
     activeRentId = 0;
   }
 
+  // callback for renter
   function onRent(uint256 _rentId, address _lenderWallet, int96 flowRate) external onlyRentalStorage {
-    console.log("[Wallet.onRent]", _rentId, _lenderWallet);
     require(activeRentId == 0, "Wallet: only support one rent at a time");
 
     // configure superfluid
-    console.log("[Wallet.onRent] creating flow...");
     cfaV1.createFlow(_lenderWallet, usdcX, flowRate);
-    console.log("[Wallet.onRent] flow created");
 
     activeRentId = _rentId;
   }
 
+  // callback for lender
   function onLend(address _renterWallet, address _tokenAddress, uint256 _tokenId) external onlyRentalStorage {
     // transfer
     try IERC721(_tokenAddress).safeTransferFrom(address(this), _renterWallet, _tokenId) {
