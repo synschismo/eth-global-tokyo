@@ -6,10 +6,12 @@ import Avatar from "boring-avatars";
 import { userMock } from "../mocks/userMock";
 import { useEffect, useState } from "react";
 import { round } from "../utils/round";
+import { walletRentsMock } from "../mocks/walletRentMock";
 
 const Home: NextPage = () => {
   const user = userMock;
   const [balanceRun, setBalanceRun] = useState(0.35);
+  const [status, setStatus] = useState<"rent" | "mynfts">("rent");
 
   useEffect(() => {
     let interval: any = null;
@@ -47,11 +49,38 @@ const Home: NextPage = () => {
           {balanceRun.toFixed(4).toString()} ETH
         </div>
       </div>
-      <div className="border-gray text-gray mb-4 mt-12 border-b border-t px-2 py-4 text-center font-bold">
-        My NFTs
+      <div className="border-gray text-gray mb-4 mt-12 grid grid-cols-2 border-b border-t px-2 py-4 text-center font-bold">
+        {status === "rent" ? (
+          <>
+            <div className="text-pink">Rent</div>
+            <div onClick={() => setStatus("mynfts")}>MyNFTs</div>
+          </>
+        ) : (
+          <>
+            <div onClick={() => setStatus("rent")}>Rent</div>
+            <div className="text-pink">MyNFTs</div>
+          </>
+        )}
       </div>
       <div className="mx-3 grid grid-cols-2 gap-y-4 pb-32">
-        {walletNftsMock &&
+        {status === "rent" &&
+          walletRentsMock.map((nft, index) => {
+            const collectionName = nft.collectionName;
+            const name = nft.name;
+            const image = nft.image;
+            const status = nft.status;
+            return (
+              <WalletNftCard
+                key={index}
+                collectionName={collectionName}
+                name={name}
+                image={image}
+                status={status}
+              />
+            );
+          })}
+        {status === "mynfts" &&
+          walletNftsMock &&
           walletNftsMock.map((nft, index) => {
             const collectionName = nft.collectionName;
             const name = nft.name;
