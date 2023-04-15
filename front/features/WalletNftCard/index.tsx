@@ -17,7 +17,7 @@ export const WalletNftCard: FC<Props> = ({
   return (
     <>
       {status === "lended" ? (
-        <div className="relative mx-auto flex h-[216px] w-[164px] items-center justify-center overflow-hidden rounded-2xl text-gray-600">
+        <div className="relative mx-auto flex h-[216px] w-[164px] items-center justify-center overflow-hidden rounded-[16px] text-gray-600">
           <div className="bg-pink absolute h-[300px] w-[100px] animate-spin"></div>
           <div className="z-10 h-[210px] w-[158px] rounded-[14px] bg-white">
             <div className="relative mx-auto mt-2 h-[148px] w-[148px] rounded-2xl bg-gray-300">
