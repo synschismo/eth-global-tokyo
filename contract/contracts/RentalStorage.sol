@@ -23,6 +23,11 @@ contract RentalStorage is Ownable, IRentalStorage {
     _;
   }
 
+  modifier onlyOrg {
+    require(msg.sender == address(walletFactory) || msg.sender == owner(), "Only organization");
+    _;
+  }
+
   mapping(address wallet => address owner) public ownerByWallet;
   mapping(address owner => address wallet) public walletByOwner;
 
@@ -34,7 +39,7 @@ contract RentalStorage is Ownable, IRentalStorage {
   function registerWallet(
     address _owner,
     address _wallet
-  ) external onlyWalletFactory {
+  ) external onlyOrg {
     require(walletByOwner[_owner] == address(0), "Wallet: already registered wallet");
     require(ownerByWallet[_wallet] == address(0), "Wallet: already registered owner");
     ownerByWallet[_wallet] = _owner;
