@@ -7,11 +7,11 @@ interface TokenBalancesOutputWrapper {
 }
 
 export async function GET(request) {
-    // const { owners, limit, cursor } = request.query
-    const owners = ["vitalik.eth", "dwr.eth"]
-    const limit = 10
-    const cursor = ""
-    const tokenBalances = await GetAllNFTs(owners, limit, cursor)
+    let url = new URL(request.url)
+    const owner = url.searchParams.get("owner")
+    const limit = Number(url.searchParams.get("limit"))
+    const cursor = url.searchParams.get("cursor")
+    const tokenBalances = await GetAllNFTs(owner, limit, cursor)
     return new Response(JSON.stringify({
         status: 200,
         body: tokenBalances,
@@ -19,48 +19,52 @@ export async function GET(request) {
 }
 
 async function GetAllNFTs(
-    owners: string[],
+    owner: string,
     limit: number,
     cursor: string
 ): Promise<TokenBalancesOutput> {
+    console.log("owner")
+    console.log(owner)
     const query = gql`
-        query MyQuery($cursor: String, $owners: [Identity!], $limit: Int) {
-            TokenBalances(
-                input: {
-                    filter: { owner: { _in: $owners }, tokenType: { _in: [ERC1155, ERC721] } }
-                    blockchain: ethereum
-                    limit: $limit
-                    cursor: $cursor
+    query MyQuery($owner: Identity!) {
+        Wallet(
+          input: {blockchain: polygon, identity: $owner}
+        ) {
+          blockchain
+          tokenBalances {
+            tokenNfts {
+              address
+              metaData {
+                image
+                imageData
+              }
+              contentValue {
+                image {
+                  large
+                  medium
+                  original
                 }
-            ) {
-                TokenBalance {
-                    tokenAddress
-                    amount
-                    tokenType
-                    tokenId
-                    owner {
-                        primaryDomain {
-                            name
-                        }
-                    }
-                }
-                pageInfo {
-                    prevCursor
-                    nextCursor
-                }
+              }
+              token {
+                id
+                name
+              }
             }
+            amount
+          }
         }
+      }
     `
 
-    const response = await client.query<TokenBalancesOutputWrapper>({
+    const response = await client.query({
         query,
         variables: {
-            owners: owners,
-            limit: limit,
-            cursor: cursor,
+            owner: owner,
+            // limit: limit,
+            // cursor: cursor,
         },
     })
-    return response.data.TokenBalances
+    return response.data
 }
 
 // const main = async () => {

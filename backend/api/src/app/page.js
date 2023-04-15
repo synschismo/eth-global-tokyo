@@ -1,101 +1,75 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from './page.module.css'
+'use client'
 
-const inter = Inter({ subsets: ['latin'] })
+import { use } from 'react'
+
+import * as LitJsSdk from '@lit-protocol/lit-node-client';
+
+
+const registerLitAction = async () => {
+
+// this code will be run on the node
+const litActionCode = `
+const go = async () => {  
+  const url = "https://api.weather.gov/gridpoints/TOP/31,80/forecast";
+  const resp = await fetch(url).then((response) => response.json());
+  const temp = resp.properties.periods[0].temperature;
+  
+  // this requests a signature share from the Lit Node
+  // the signature share will be automatically returned in the HTTP response from the node
+  // all the params (toSign, publicKey, sigName) are passed in from the LitJsSdk.executeJs() function
+  const sigShare = await LitActions.signEcdsa({ toSign, publicKey , sigName });
+  LitActions.log({ message: "sigShare: " + sigShare });
+};
+
+go();
+`;
+
+// you need an AuthSig to auth with the nodes
+// normally you would obtain an AuthSig by calling LitJsSdk.checkAndSignAuthMessage({chain})
+  const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: "polygon"})
+  // const authSig = {
+  //   sig: "0x2bdede6164f56a601fc17a8a78327d28b54e87cf3fa20373fca1d73b804566736d76efe2dd79a4627870a50e66e1a9050ca333b6f98d9415d8bca424980611ca1c",
+  //   derivedVia: "web3.eth.personal.sign",
+  //   signedMessage:
+  //     "localhost wants you to sign in with your Ethereum account:\n0x9D1a5EC58232A894eBFcB5e466E3075b23101B89\n\nThis is a key for Partiful\n\nURI: https://localhost/login\nVersion: 1\nChain ID: 1\nNonce: 1LF00rraLO4f7ZSIt\nIssued At: 2022-06-03T05:59:09.959Z",
+  //   address: "0x9D1a5EC58232A894eBFcB5e466E3075b23101B89",
+  // };
+  console.log("here",authSig)
+
+// const runLitAction = async () => {
+  const litNodeClient = new LitJsSdk.LitNodeClient({
+    alertWhenUnauthorized: true,
+    litNetwork: "serrano",
+    debug: true,
+  });
+  await litNodeClient.connect();
+  console.log("connected")
+  const signatures = await litNodeClient.executeJs({
+    code: litActionCode,
+    authSig,
+    // all jsParams can be used anywhere in your litActionCode
+    jsParams: {
+      // this is the string "Hello World" for testing
+      toSign: [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100],
+      publicKey:
+        "0x04b8f9eae53cedc023c71f6b65bb952bc38507957e264a04e513dbffa8a1c4db9e7cd4f47e2d94c7cab51954938f810569c6fe7e995f3282c26935f2c5e9db7066",
+      sigName: "sig1",
+    },
+  });
+  console.log("signatures: ", signatures);
+// };
+
+
+
+}
+
 
 export default function Home() {
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+    <main>
+      <div >
+        <p>hello</p>
+        <button onClick={registerLitAction}>create lit actions</button>
       </div>
     </main>
   )
