@@ -20,7 +20,7 @@ const detail = () => {
   const [nowStatus, setNowStatus] = useState<"available" | "rented">(
     "available"
   );
-  const [balanceRun, setBalanceRun] = useState<number>(0.1);
+  const [balanceRun, setBalanceRun] = useState<number>(0.34);
 
   useEffect(() => {
     let interval: any = null;
