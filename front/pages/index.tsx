@@ -14,33 +14,33 @@ const Home: NextPage = () => {
   const [balanceRun, setBalanceRun] = useState(0.35);
   const [status, setStatus] = useState<"rent" | "mynfts">("rent");
   const [userNfts, setUserNfts] = useState<UserNftType[] | null>(null);
-  const address = "0x386d0F7dADC9d692CD22Ac8F277bCf79Ab045373";
+  // const address = "0x386d0F7dADC9d692CD22Ac8F277bCf79Ab045373";
 
-  useEffect(() => {
-    const settings = {
-      apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
-      network: Network.MATIC_MUMBAI,
-      maxRetries: 100,
-    };
-    const f = async () => {
-      const alchemy = initializeAlchemy(settings);
-      const tmpNFTs = await getNftsForOwner(alchemy, address as string, {
-        contractAddresses: ["0x56cc0d929714F2198bf0E3E8866c6AF792aD4041"],
-      });
-      const data: UserNftType[] = tmpNFTs.ownedNfts.map((nft) => {
-        const tmpDate: UserNftType = {
-          collectionName: nft.contract.address,
-          name: nft.title,
-          image: nft.media[0].gateway,
-          status: "available",
-        };
-        return tmpDate;
-      });
-      setUserNfts(data);
-      return data;
-    };
-    f();
-  }, []);
+  // useEffect(() => {
+  //   const settings = {
+  //     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
+  //     network: Network.MATIC_MUMBAI,
+  //     maxRetries: 100,
+  //   };
+  //   const f = async () => {
+  //     const alchemy = initializeAlchemy(settings);
+  //     const tmpNFTs = await getNftsForOwner(alchemy, address as string, {
+  //       contractAddresses: ["0x56cc0d929714F2198bf0E3E8866c6AF792aD4041"],
+  //     });
+  //     const data: UserNftType[] = tmpNFTs.ownedNfts.map((nft) => {
+  //       const tmpDate: UserNftType = {
+  //         collectionName: nft.contract.address,
+  //         name: nft.title,
+  //         image: nft.media[0].gateway,
+  //         status: "available",
+  //       };
+  //       return tmpDate;
+  //     });
+  //     setUserNfts(data);
+  //     return data;
+  //   };
+  //   f();
+  // }, []);
 
   useEffect(() => {
     let interval: any = null;
