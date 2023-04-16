@@ -1,4 +1,15 @@
 # Contracts
+## Deployed addresses
+
+### Polygon Mumbai
+
+| name | address | polygonscan |
+| --- | --- | --- |
+| RentalStorage | `0x3D88436c1d23faabEc7B0BbEE794Ba638FF56129` | [scan](https://mumbai.polygonscan.com/address/0x3D88436c1d23faabEc7B0BbEE794Ba638FF56129) |
+| WalletFactory | `0x7f550233D6cB1a57414b90ec1cE9f5E272dA3952` | [scan](https://mumbai.polygonscan.com/address/0x7f550233D6cB1a57414b90ec1cE9f5E272dA3952) |
+| Renter Contact Wallet | `0x8fd1A0F47fF55eBe86Ac5b1f1C347c33773F4778` | [scan](https://mumbai.polygonscan.com/address/0x8fd1A0F47fF55eBe86Ac5b1f1C347c33773F4778) |
+| Lender Contact Wallet | `0x98633598b73fF218BB403Df142e96bDE2A75fa48` | [scan](https://mumbai.polygonscan.com/address/0x98633598b73fF218BB403Df142e96bDE2A75fa48) |
+
 ## Costs
 ```
 ·-----------------------------------------|---------------------------|-------------|-----------------------------·
