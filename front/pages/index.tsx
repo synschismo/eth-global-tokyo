@@ -6,110 +6,38 @@ import Avatar from "boring-avatars";
 import { userMock } from "../mocks/userMock";
 import { useEffect, useState } from "react";
 import { walletRentsMock } from "../mocks/walletRentMock";
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client/core";
+import { Network, getNftsForOwner, initializeAlchemy } from "@alch/alchemy-sdk";
 import { UserNftType } from "../types/UserNftType";
 
 const Home: NextPage = () => {
   const user = userMock;
   const [balanceRun, setBalanceRun] = useState(0.35);
   const [status, setStatus] = useState<"rent" | "mynfts">("rent");
-  const [userNfts, setUserNfts] = useState(null);
+  const [userNfts, setUserNfts] = useState<UserNftType[] | null>(null);
+  const address = "0x386d0F7dADC9d692CD22Ac8F277bCf79Ab045373";
 
   useEffect(() => {
-    const AIRSTACK_ENDPOINT = "https://api.airstack.xyz/gql";
-    const AIRSTACK_API_KEY = process.env.NEXT_PUBLIC_AIRSTACK_KEY
-      ? process.env.NEXT_PUBLIC_AIRSTACK_KEY
-      : "";
-
-    const client = new ApolloClient({
-      uri: AIRSTACK_ENDPOINT,
-      cache: new InMemoryCache(),
-      headers: { Authorization: AIRSTACK_API_KEY },
-    });
-
+    const settings = {
+      apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
+      network: Network.MATIC_MUMBAI,
+      maxRetries: 100,
+    };
     const f = async () => {
-      const query = gql`
-        query MyQuery($cursor: String, $owners: [Identity!], $limit: Int) {
-          TokenNfts(
-            input: {
-              filter: {
-                address: { _eq: "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d" }
-              }
-              blockchain: ethereum
-            }
-          ) {
-            TokenNft {
-              address
-              chainId
-              contentType
-              contentValue {
-                image {
-                  extraSmall
-                  original
-                  large
-                }
-              }
-              #currentHolderCount - being fixed
-              id
-              lastTransferBlock
-              lastTransferHash
-              lastTransferTimestamp
-              metaData {
-                animationUrl
-                attributes {
-                  trait_type
-                  value
-                }
-                backgroundColor
-                description
-                image
-                externalUrl
-                imageData
-                name
-                youtubeUrl
-              }
-              rawMetaData
-              token {
-                id
-              }
-              tokenBalances {
-                id
-              }
-              tokenId
-              tokenURI
-              totalSupply
-              #transferCount - being fixed
-              type
-            }
-            pageInfo {
-              nextCursor
-              prevCursor
-            }
-          }
-        }
-      `;
-
-      const response = await client.query({
-        query,
-        variables: {
-          owners: ["0x5eFd4B32c4ccbB09912f3Db83Bc43FD33E239f09"],
-          limit: 10,
-          cursor: "",
-        },
+      const alchemy = initializeAlchemy(settings);
+      const tmpNFTs = await getNftsForOwner(alchemy, address as string, {
+        contractAddresses: ["0x56cc0d929714F2198bf0E3E8866c6AF792aD4041"],
       });
-      // console.log(response);
-      const data = response.data.TokenBalances.TokenBalance.map(
-        (token: any) => {
-          const tmpDate: UserNftType = {
-            name: "",
-            image: "",
-            collectionName: token.token.name,
-            status: "available",
-          };
-          return tmpDate;
-        }
-      );
+      const data: UserNftType[] = tmpNFTs.ownedNfts.map((nft) => {
+        const tmpDate: UserNftType = {
+          collectionName: nft.contract.address,
+          name: nft.title,
+          image: nft.media[0].gateway,
+          status: "available",
+        };
+        return tmpDate;
+      });
       setUserNfts(data);
+      return data;
     };
     f();
   }, []);
