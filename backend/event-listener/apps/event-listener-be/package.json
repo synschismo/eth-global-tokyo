@@ -11,7 +11,7 @@
     "bull": "^4.10.2",
     "esbuild": "^0.17.5",
     "ethers": "^5.7.2",
-    "pm2": "^5.2.2",
+    "pm2": "^7.0.0",
     "utils": "*"
   },
   "devDependencies": {
